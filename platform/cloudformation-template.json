@@ -1,0 +1,31 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+
+  "Description" : "Resources needed to run Eighty Kilometres server",
+
+  "Resources" : {
+
+"WorldInstanceConfig" : {
+   "Type" : "AWS::AutoScaling::LaunchConfiguration",
+   "Properties" : {
+      "ImageId" : "ami-ba3492c9",      
+      "InstanceType" : "t2.micro",
+      "BlockDeviceMappings" : [ {
+         "DeviceName" : "/dev/sda",
+         "VirtualName" : "ephemeral10"
+      } ]
+   }
+},
+
+"WorldInstanceGroup" : {
+   "Type" : "AWS::AutoScaling::AutoScalingGroup",
+   "Properties" : {
+      "AvailabilityZones" : { "Fn::GetAZs" : ""},
+      "LaunchConfigurationName" : { "Ref" : "WorldInstanceConfig" },
+      "MinSize" : "0",
+      "MaxSize" : "1"
+   }
+}
+
+  }
+}
