@@ -5,7 +5,7 @@
 
   "Resources" : {
 
-"WorldInstanceConfig" : {
+"WorldInstanceLaunchConfiguration" : {
    "Type" : "AWS::AutoScaling::LaunchConfiguration",
    "Properties" : {
       "ImageId" : "ami-ba3492c9",      
@@ -21,7 +21,7 @@
    "Type" : "AWS::AutoScaling::AutoScalingGroup",
    "Properties" : {
       "AvailabilityZones" : { "Fn::GetAZs" : ""},
-      "LaunchConfigurationName" : { "Ref" : "WorldInstanceConfig" },
+      "LaunchConfigurationName" : { "Ref" : "WorldInstanceLaunchConfiguration" },
       "MinSize" : "0",
       "MaxSize" : "1"
    }
