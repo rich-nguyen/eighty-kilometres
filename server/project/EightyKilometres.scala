@@ -2,6 +2,7 @@ package com.gamex
 
 import sbt.{Build, Project}
 import sbt.Keys._
+import sbt.file
 import play.PlayScala
 
 object EightyKilometres extends Build {
