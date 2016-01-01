@@ -6,25 +6,46 @@
   "Resources" : {
 
 "WorldInstanceLaunchConfiguration" : {
-   "Type" : "AWS::AutoScaling::LaunchConfiguration",
-   "Properties" : {
-      "ImageId" : "ami-ba3492c9",      
-      "InstanceType" : "t2.micro",
-      "BlockDeviceMappings" : [ {
-         "DeviceName" : "/dev/sda",
-         "VirtualName" : "ephemeral10"
-      } ]
-   }
+  "Type" : "AWS::AutoScaling::LaunchConfiguration",
+  "Properties" : {
+    "ImageId" : "ami-47a23a30",      
+    "InstanceType" : "t2.micro",
+    "KeyName": "eighty-kilometres",
+    "SecurityGroups": [
+      { "Ref": "WebServerSecurityGroup" }
+    ],
+    "UserData": {
+      "Fn::Base64": { "Fn::Join": ["", [
+          "#!/bin/bash -ev\n",
+
+          "cd /home/ubuntu\n",
+          "sudo locale-gen en_US.UTF-8\n",
+          "sudo locale-gen en_GB.UTF-8\n",
+          "sudo add-apt-repository -y ppa:webupd8team/java\n",
+          "sudo apt-get update\n",
+          "sudo apt-get install -y unzip\n",
+          "echo 'oracle-java8-installer shared/accepted-oracle-license-v1-1 select true' | sudo debconf-set-selections\n",
+          "sudo apt-get install -y  oracle-java8-installer\n",
+          "wget https://s3-eu-west-1.amazonaws.com/eightykilometres/deploys/server.zip\n",
+          "unzip server.zip\n",
+          "eightykilometres-0.1-SNAPSHOT/bin/eightykilometres -Dplay.crypto.secret=publicsecret\n"
+      ]] }
+    }  
+  }
 },
 
 "WorldInstanceGroup" : {
-   "Type" : "AWS::AutoScaling::AutoScalingGroup",
-   "Properties" : {
-      "AvailabilityZones" : { "Fn::GetAZs" : ""},
-      "LaunchConfigurationName" : { "Ref" : "WorldInstanceLaunchConfiguration" },
-      "MinSize" : "0",
-      "MaxSize" : "1"
-   }
+  "Type" : "AWS::AutoScaling::AutoScalingGroup",
+  "Properties" : {
+    "AvailabilityZones" : { "Fn::GetAZs" : ""},
+    "LaunchConfigurationName" : { "Ref" : "WorldInstanceLaunchConfiguration" },
+    "LoadBalancerNames": [
+      { "Ref": "WorldLoadBalancer" }
+    ],
+    "MinSize" : "0",
+    "DesiredCapacity": "1",
+    "MaxSize" : "1"
+  }
 },
 
 "WorldLoadBalancer": {
@@ -39,17 +60,56 @@
     "Listeners": [
       {
         "LoadBalancerPort": "80",
-        "InstancePort": "80",
+        "InstancePort": "9000",
         "Protocol": "HTTP"
       }
     ],
     "HealthCheck": {
-      "Target": "HTTP:80/",
+      "Target": "HTTP:9000/",
       "HealthyThreshold": "2",
       "UnhealthyThreshold": "10",
       "Interval": "60",
       "Timeout": "5"
-    }
+    },
+    "SecurityGroups": [
+      { "Fn::GetAtt": ["LoadBalancerSecurityGroup", "GroupId"] }
+    ]
+  }
+},
+
+"WebServerSecurityGroup": {
+  "Type": "AWS::EC2::SecurityGroup",
+  "Properties": {
+    "GroupDescription": "HTTP from Amazon Load Balancers",
+    "SecurityGroupIngress": [
+        {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "0.0.0.0/0"
+        },
+        {
+            "IpProtocol": "tcp",
+            "FromPort": "9000",
+            "ToPort": "9000",
+            "SourceSecurityGroupName": { "Ref": "LoadBalancerSecurityGroup" }
+        }
+    ]
+  }
+},
+
+"LoadBalancerSecurityGroup": {
+  "Type": "AWS::EC2::SecurityGroup",
+  "Properties": {
+    "GroupDescription": "Elastic LoadBalancer SecurityGroup",
+    "SecurityGroupIngress": [
+        {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": "0.0.0.0/0"
+        }
+    ]        
   }
 }
 
