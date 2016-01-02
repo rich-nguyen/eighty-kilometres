@@ -1,1 +1,3 @@
-GET     /                           controllers.WorldViewController.index()
+GET        /                                   controllers.WorldViewController.index()
+
+GET        /client/allotments/plan.json        controllers.WorldViewController.allotmentPlan()
