@@ -10,7 +10,8 @@ object WorldViewController extends Controller with ExecutionContexts {
     }
 
     def allotmentPlan = Action {
-      Ok("Hello, I am the World View page.")
+      val allotments = common.DynamoDB.getAllotments
+      Ok("Hello, I am the World View page. Allotments:" + allotments)
     }
 
 }
