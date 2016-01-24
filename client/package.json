@@ -1,0 +1,27 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/app.js",
+  "browserify": {
+    "transform": [
+      "glslify"
+    ]
+  },
+  "dependencies": {    
+    "bunny": "^1.0.1",
+    "canvas-fit": "^1.2.0",
+    "canvas-orbit-camera": "^1.0.0",
+    "gl-context": "^0.1.1",
+    "gl-geometry": "^1.0.0",
+    "gl-mat4": "^1.0.0",
+    "gl-shader": "^4.0.5",
+    "glslify": "^2.2.1",
+    "normals": "^0.1.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

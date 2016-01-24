@@ -1,7 +1,9 @@
 ###Tools used
 
 1. aws-cli - brew install awscli
-
+2. browserify/beefy - npm install beefy browserify -g
+    - browserify src/app.js -o bundle.js
+    - beefy src/app.js 9001
 
 ###Log Book
 
