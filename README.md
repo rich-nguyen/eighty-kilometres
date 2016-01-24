@@ -1,9 +1,9 @@
 ###Tools used
 
 1. aws-cli - brew install awscli
-2. browserify/beefy - npm install beefy browserify -g
-    - browserify src/app.js -o bundle.js
-    - beefy src/app.js 9001
+2. browserify/beefy - npm install -g beefy@2.1.5 browserify@12.0.0
+    - Build output: browserify client/src/app.js -o client/target/bundle.js
+    - Run asset server: beefy src/app.js 9001
 
 ###Log Book
 
@@ -28,3 +28,5 @@ Model formatting is another thing to skip around. Try asset import?
     - https://github.com/acgessler/assimp2json
 
 Conclusion: Try stack.gl. it's small and modular, shader-oriented.
+
+add canvas-loop
