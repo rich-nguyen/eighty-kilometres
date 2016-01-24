@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -o xtrace
-
 # Clean built assets
 rm -rf client/target
 mkdir -p client/target
