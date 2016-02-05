@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Clean built assets
-rm -rf client/target
-mkdir -p client/target
-
-# Build news assets
-browserify client/src/app.js -o client/target/app.js
+pushd client
+rm -rf target
+mkdir -p target
+gulp
+popd
 
 pushd server
 sbt dist
