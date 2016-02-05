@@ -1,8 +1,8 @@
 ###Tools used
 
 1. aws-cli - brew install awscli
-2. browserify/beefy - npm install -g beefy@2.1.5 browserify@12.0.0
-    - Build output: browserify client/src/app.js -o client/target/bundle.js
+2. beefy - npm install -g beefy@2.1.5 browserify@12.0.0 gulp-cli@1.2.0
+    - Build output: browserify client/src/app.js -o client/target/app.js
     - Run asset server: beefy src/app.js 9001
 
 ###Log Book
