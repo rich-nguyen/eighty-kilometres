@@ -1,10 +1,18 @@
+/// <reference path="ambient/typings/main.d.ts" />
+/// <reference path="ambient/stackgl.d.ts" />
+
 var Geometry = require('gl-geometry')
 var fit      = require('canvas-fit')
 var glShader = require('gl-shader')
 var mat4     = require('gl-mat4')
 var normals  = require('normals')
 var glslify  = require('glslify')
-var bunny    = require('bunny')
+import context = require('gl-context')
+import bunny   = require('bunny');
+
+import greetr from './greeter';
+greetr.run();
+greetr.greeter("richard");
 
 // Creates a canvas element and attaches
 // it to the <body> on your DOM.
@@ -19,7 +27,7 @@ var camera = require('canvas-orbit-camera')(canvas)
 // a new WebGL context – the `render` function
 // supplied here is called every frame to draw
 // to the screen.
-var gl = require('gl-context')(canvas, render)
+var gl = context(canvas, render)
 
 // Resizes the <canvas> to fully fit the window
 // whenever the window is resized.
@@ -52,8 +60,8 @@ geometry.faces(bunny.cells)
 var projection = mat4.create()
 var model      = mat4.create()
 var view       = mat4.create()
-var height
-var width
+var height :any
+var width :any
 
 // Pulls up our shader code and returns an instance
 // of gl-shader. Using the glslify browserify transform,
