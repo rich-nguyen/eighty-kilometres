@@ -1,7 +1,7 @@
 /// <reference path="ambient/typings/main.d.ts" />
 /// <reference path="ambient/stackgl.d.ts" />
 
-var Geometry = require('gl-geometry')
+
 var fit      = require('canvas-fit')
 var glShader = require('gl-shader')
 var mat4     = require('gl-mat4')
@@ -9,6 +9,7 @@ var normals  = require('normals')
 var glslify  = require('glslify')
 import context = require('gl-context')
 import bunny   = require('bunny');
+import Geometry = require('gl-geometry')
 
 import greetr from './greeter';
 greetr.run();
