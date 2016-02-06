@@ -4,6 +4,9 @@
 2. beefy - npm install -g beefy@2.1.5 browserify@12.0.0 gulp-cli@1.2.0
     - Build output: browserify client/src/app.js -o client/target/app.js
     - Run asset server: beefy src/app.js 9001
+    - alternative: python -m SimpleHTTPServer
+3. typescript - npm install -g typescript@1.7.5 typings@0.6.6
+    - typings install, in src folder
 
 ###Log Book
 
@@ -30,3 +33,8 @@ Model formatting is another thing to skip around. Try asset import?
 Conclusion: Try stack.gl. it's small and modular, shader-oriented.
 
 add canvas-loop
+
+####Entry 2 - Prepping the codebase
+
+Adding gulp, typescript, typings, tsify, definition files! That's enough to get type annotations when rendering stuff.
+Can't find many existing type definitions for stackgl, and it looks like beefy may struggle with gulp.
