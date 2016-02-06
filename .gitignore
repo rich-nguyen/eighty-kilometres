@@ -21,6 +21,7 @@ logs
 tmp
 old
 target
+typings
 .target
 /*/bin/
 
