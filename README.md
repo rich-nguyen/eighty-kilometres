@@ -39,3 +39,4 @@ add canvas-loop
 Adding gulp, typescript, typings, tsify, definition files! That's enough to get type annotations when rendering stuff.
 Can't find many existing type definitions for stackgl, and it looks like beefy may struggle with gulp.
     - https://basarat.gitbooks.io/typescript/content/
+    - https://blogs.msdn.microsoft.com/typescript/
