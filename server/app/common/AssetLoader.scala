@@ -12,7 +12,7 @@ object AssetLoader {
   private val assets = List(
     AssetPath(
       "app.js",
-      "http://localhost:9001/src/app.js",
+      "http://localhost:8000/app.js",
       "https://s3-eu-west-1.amazonaws.com/eightykilometres/deploys/assets/app.js")
   )
 
