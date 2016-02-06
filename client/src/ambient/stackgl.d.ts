@@ -9,6 +9,6 @@ declare module "bunny" {
 }
 
 declare module "gl-context" {
-    function createContext(...args: any[]): any;
+    function createContext(canvas: any, opts?: any, render?: any): any;
     export = createContext;
 }
