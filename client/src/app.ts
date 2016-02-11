@@ -8,9 +8,10 @@ var normals  = require('normals')
 var glslify  = require('glslify')
 
 import * as mat4 from 'gl-mat4'
-import context from 'gl-context'
+import { IMatrix } from 'gl-mat4'
+import createContext, { GLContext } from 'gl-context'
 import * as bunny from 'bunny'
-import Geometry from 'gl-geometry'
+import createGeometry, { GLGeometry } from 'gl-geometry'
 
 import greetr from './greeter';
 greetr.run();
@@ -29,7 +30,7 @@ var camera = require('canvas-orbit-camera')(canvas)
 // a new WebGL context – the `render` function
 // supplied here is called every frame to draw
 // to the screen.
-var gl: gl.GLContext = context(canvas, render)
+var gl: GLContext = createContext(canvas, render)
 
 // Resizes the <canvas> to fully fit the window
 // whenever the window is resized.
@@ -46,7 +47,7 @@ window.addEventListener('resize'
 // with three.js, this is essentially equivalent to an array
 // of `THREE.Vector3` and `THREE.Face3` instances, except specified
 // as arrays for simplicity and interoperability.
-var geometry: gl.GLGeometry = Geometry(gl)
+var geometry: GLGeometry = createGeometry(gl)
 
 geometry.attr('aPosition', bunny.positions)
 geometry.attr('aNormal', normals.vertexNormals(
@@ -59,7 +60,7 @@ geometry.faces(bunny.cells)
 // Create the base matrices to be used
 // when rendering the bunny. Alternatively, can
 // be created using `new Float32Array(16)`
-var projection: gl.IMatrix = mat4.create()
+var projection: IMatrix = mat4.create()
 var model      = mat4.create()
 var view       = mat4.create()
 var height :any
