@@ -1,19 +1,14 @@
 
 declare module "gl-mat4" {
 
-    export interface IMatrix {
-        /**
-         * Must be indexable like an array
-         */
-        [index: number]: number;
-    }
+    import { Matrix } from "stackgl"
 
     /**
      * Creates a new identity mat4
      *
      * @returns a new 4x4 matrix
      */
-    export function create(): IMatrix;
+    export function create(): Matrix;
 
     /**
      * Creates a new mat4 initialized with values from an existing matrix
@@ -21,7 +16,7 @@ declare module "gl-mat4" {
      * @param a matrix to clone
      * @returns a new 4x4 matrix
      */
-    export function clone(a: IMatrix): IMatrix;
+    export function clone(a: Matrix): Matrix;
 
     /**
      * Copy the values from one mat4 to another
@@ -30,7 +25,7 @@ declare module "gl-mat4" {
      * @param a the source matrix
      * @returns out
      */
-    export function copy(out: IMatrix, a: IMatrix): IMatrix;
+    export function copy(out: Matrix, a: Matrix): Matrix;
 
     /**
      * Set a mat4 to the identity matrix
@@ -38,7 +33,7 @@ declare module "gl-mat4" {
      * @param out the receiving matrix
      * @returns out
      */
-    export function identity(a: IMatrix): IMatrix;
+    export function identity(a: Matrix): Matrix;
 
     /**
      * Transpose the values of a mat4
@@ -47,7 +42,7 @@ declare module "gl-mat4" {
      * @param a the source matrix
      * @returns out
      */
-    export function transpose(out: IMatrix, a: IMatrix): IMatrix; 
+    export function transpose(out: Matrix, a: Matrix): Matrix; 
 
     /**
      * Inverts a mat4
@@ -56,7 +51,7 @@ declare module "gl-mat4" {
      * @param a the source matrix
      * @returns out
      */
-    export function invert(out: IMatrix, a: IMatrix): IMatrix;
+    export function invert(out: Matrix, a: Matrix): Matrix;
 
     /**
      * Calculates the adjugate of a mat4
@@ -65,7 +60,7 @@ declare module "gl-mat4" {
      * @param a the source matrix
      * @returns out
      */
-    export function adjoint(out: IMatrix, a: IMatrix): IMatrix;
+    export function adjoint(out: Matrix, a: Matrix): Matrix;
 
     /**
      * Calculates the determinant of a mat4
@@ -73,7 +68,7 @@ declare module "gl-mat4" {
      * @param a the source matrix
      * @returns determinant of a
      */
-    export function determinant(a: IMatrix): number;
+    export function determinant(a: Matrix): number;
 
     /**
      * Multiplies two mat4's
@@ -83,7 +78,7 @@ declare module "gl-mat4" {
      * @param b the second operand
      * @returns out
      */
-    export function multiply(out: IMatrix, a: IMatrix, b: IMatrix): IMatrix;
+    export function multiply(out: Matrix, a: Matrix, b: Matrix): Matrix;
 
     /**
      * Multiplies two mat4's
@@ -93,7 +88,7 @@ declare module "gl-mat4" {
      * @param b the second operand
      * @returns out
      */
-    export function mul(out: IMatrix, a: IMatrix, b: IMatrix): IMatrix;
+    export function mul(out: Matrix, a: Matrix, b: Matrix): Matrix;
 
     /**
      * Translate a mat4 by the given vector
@@ -103,7 +98,7 @@ declare module "gl-mat4" {
      * @param v vector to translate by
      * @returns out
      */
-    export function translate(out: IMatrix, a: IMatrix, v: IMatrix): IMatrix;
+    export function translate(out: Matrix, a: Matrix, v: Matrix): Matrix;
 
     /**
      * Scales the mat4 by the dimensions in the given vec3
@@ -113,7 +108,7 @@ declare module "gl-mat4" {
      * @param v the vec3 to scale the matrix by
      * @returns out
      **/
-    export function scale(out: IMatrix, a: IMatrix, v: IMatrix): IMatrix;
+    export function scale(out: Matrix, a: Matrix, v: Matrix): Matrix;
 
     /**
      * Rotates a mat4 by the given angle
@@ -124,7 +119,7 @@ declare module "gl-mat4" {
      * @param axis the axis to rotate around
      * @returns out
      */
-    export function rotate(out: IMatrix, a: IMatrix, rad: number, axis: IMatrix): IMatrix;
+    export function rotate(out: Matrix, a: Matrix, rad: number, axis: Matrix): Matrix;
 
     /**
      * Rotates a matrix by the given angle around the X axis
@@ -134,7 +129,7 @@ declare module "gl-mat4" {
      * @param rad the angle to rotate the matrix by
      * @returns out
      */
-    export function rotateX(out: IMatrix, a: IMatrix, rad: number): IMatrix;
+    export function rotateX(out: Matrix, a: Matrix, rad: number): Matrix;
 
     /**
      * Rotates a matrix by the given angle around the Y axis
@@ -144,7 +139,7 @@ declare module "gl-mat4" {
      * @param rad the angle to rotate the matrix by
      * @returns out
      */
-    export function rotateY(out: IMatrix, a: IMatrix, rad: number): IMatrix;
+    export function rotateY(out: Matrix, a: Matrix, rad: number): Matrix;
 
     /**
      * Rotates a matrix by the given angle around the Z axis
@@ -154,7 +149,7 @@ declare module "gl-mat4" {
      * @param rad the angle to rotate the matrix by
      * @returns out
      */
-    export function rotateZ(out: IMatrix, a: IMatrix, rad: number): IMatrix;
+    export function rotateZ(out: Matrix, a: Matrix, rad: number): Matrix;
 
     /**
      * Generates a frustum matrix with the given bounds
@@ -168,8 +163,8 @@ declare module "gl-mat4" {
      * @param far Far bound of the frustum
      * @returns out
      */
-    export function frustum(out: IMatrix, left: number, right: number,
-        bottom: number, top: number, near: number, far: number): IMatrix;
+    export function frustum(out: Matrix, left: number, right: number,
+        bottom: number, top: number, near: number, far: number): Matrix;
     
     /**
      * Generates a perspective projection matrix with the given bounds
@@ -181,8 +176,8 @@ declare module "gl-mat4" {
      * @param far Far bound of the frustum
      * @returns out
      */
-    export function perspective(out: IMatrix, fovy: number, aspect: number,
-        near: number, far: number): IMatrix;
+    export function perspective(out: Matrix, fovy: number, aspect: number,
+        near: number, far: number): Matrix;
     
     /**
      * Generates a orthogonal projection matrix with the given bounds
@@ -196,8 +191,8 @@ declare module "gl-mat4" {
      * @param far Far bound of the frustum
      * @returns out
      */
-    export function ortho(out: IMatrix, left: number, right: number,
-        bottom: number, top: number, near: number, far: number): IMatrix;
+    export function ortho(out: Matrix, left: number, right: number,
+        bottom: number, top: number, near: number, far: number): Matrix;
     
     /**
      * Generates a look-at matrix with the given eye position, focal point, and up axis
@@ -208,8 +203,8 @@ declare module "gl-mat4" {
      * @param up vec3 pointing up
      * @returns out
      */
-    export function lookAt(out: IMatrix, eye: IMatrix,
-        center: IMatrix, up: IMatrix): IMatrix;
+    export function lookAt(out: Matrix, eye: Matrix,
+        center: Matrix, up: Matrix): Matrix;
     
     /**
      * Returns a string representation of a mat4
@@ -217,7 +212,7 @@ declare module "gl-mat4" {
      * @param mat matrix to represent as a string
      * @returns string representation of the matrix
      */
-    export function str(mat: IMatrix): string;
+    export function str(mat: Matrix): string;
 
     /**
      * Returns Frobenius norm of a mat4
@@ -225,7 +220,7 @@ declare module "gl-mat4" {
      * @param a the matrix to calculate Frobenius norm of
      * @returns Frobenius norm
      */
-    export function frob(a: IMatrix): number;
+    export function frob(a: Matrix): number;
 
     /**
      * Creates a matrix from a quaternion rotation and vector translation
@@ -242,7 +237,7 @@ declare module "gl-mat4" {
      * @param v Translation vector
      * @returns out
      */
-    export function fromRotationTranslation(out: IMatrix, q: IMatrix, v: IMatrix): IMatrix;
+    export function fromRotationTranslation(out: Matrix, q: Matrix, v: Matrix): Matrix;
     
     /**
      * Creates a matrix from a quaternion
@@ -251,7 +246,7 @@ declare module "gl-mat4" {
      * @param q Rotation quaternion
      * @returns out
      */
-    export function fromQuat(out: IMatrix, q: IMatrix): IMatrix;
+    export function fromQuat(out: Matrix, q: Matrix): Matrix;
 }
 
 declare module "bunny" {
@@ -259,9 +254,16 @@ declare module "bunny" {
     export var cells: any;
 }
 
-declare module "gl-context" {
+declare module "stackgl" {
 
-    export class GLContext {
+    export interface Matrix {
+        /**
+         * Must be indexable like an array
+         */
+        [index: number]: number;
+    }
+
+    export class Context {
         drawingBufferWidth: number;
         drawingBufferHeight: number;
         viewport(top: number, left: number, right: number, bottom: number): void;
@@ -272,19 +274,28 @@ declare module "gl-context" {
         TRIANGLES: any;
     }
 
-    export default function createContext(canvas: any, opts ?: any, render ?: any): GLContext;    
+    export class Geometry {
+        attr(name: any, attr: any, opts?: any): Geometry;
+        faces(attr: any, opts?: any): Geometry;
+        bind(shader: any): void;
+        draw(triangles: any): void;
+
+        constructor(context: Context);
+    }
+}
+
+declare module "gl-context" {
+
+    import {Context} from 'stackgl'
+
+    function createContext(canvas: any, opts ?: any, render ?: any): Context;    
+
+    export = createContext;
 }
 
 declare module "gl-geometry" {
 
-    import { GLContext } from "gl-context";
+    import {Context, Geometry} from 'stackgl'
 
-    export class GLGeometry {
-        attr(name: any, attr: any, opts?: any): GLGeometry;
-        faces(attr: any, opts?: any): GLGeometry;
-        bind(shader: any): void;
-        draw(triangles: any): void;
-    }
-
-    export default function createGeometry(context: GLContext): GLGeometry;
+    export = Geometry;
 }
