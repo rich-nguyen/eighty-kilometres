@@ -1,24 +1,23 @@
 /// <reference path="ambient/typings/main.d.ts" />
 /// <reference path="ambient/stackgl.d.ts" />
 
-
 var fit      = require('canvas-fit')
 var glShader = require('gl-shader')
 var normals  = require('normals')
 var glslify  = require('glslify')
 
 import * as mat4 from 'gl-mat4'
-import { IMatrix } from 'gl-mat4'
-import createContext, { GLContext } from 'gl-context'
+import createContext = require('gl-context')
 import * as bunny from 'bunny'
-import createGeometry, { GLGeometry } from 'gl-geometry'
+import Geometry = require('gl-geometry')
+import { Context, Matrix } from 'stackgl'
 
 import greetr from './greeter';
 greetr.run();
 greetr.greeter("richard");
 
 // Creates a canvas element and attaches
-// it to the <body> on your DOM.
+// it to the <body> on your DOM.hello richard, i loveyou x
 var canvas: Node = document.body.appendChild(document.createElement('canvas'))
 
 // Creates an instance of canvas-orbit-camera,
@@ -30,7 +29,7 @@ var camera = require('canvas-orbit-camera')(canvas)
 // a new WebGL context – the `render` function
 // supplied here is called every frame to draw
 // to the screen.
-var gl: GLContext = createContext(canvas, render)
+var gl: Context = createContext(canvas, render)
 
 // Resizes the <canvas> to fully fit the window
 // whenever the window is resized.
@@ -47,7 +46,7 @@ window.addEventListener('resize'
 // with three.js, this is essentially equivalent to an array
 // of `THREE.Vector3` and `THREE.Face3` instances, except specified
 // as arrays for simplicity and interoperability.
-var geometry: GLGeometry = createGeometry(gl)
+var geometry: Geometry = new Geometry(gl)
 
 geometry.attr('aPosition', bunny.positions)
 geometry.attr('aNormal', normals.vertexNormals(
@@ -60,7 +59,7 @@ geometry.faces(bunny.cells)
 // Create the base matrices to be used
 // when rendering the bunny. Alternatively, can
 // be created using `new Float32Array(16)`
-var projection: IMatrix = mat4.create()
+var projection: Matrix = mat4.create()
 var model      = mat4.create()
 var view       = mat4.create()
 var height :any
