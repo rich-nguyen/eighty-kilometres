@@ -2,9 +2,8 @@
 
 1. aws-cli - brew install awscli
 2. beefy - npm install -g beefy@2.1.5 browserify@12.0.0 gulp-cli@1.2.0
-    - Build output: browserify client/src/app.js -o client/target/app.js
-    - Run asset server: beefy src/app.js 9001
-    - alternative: python -m SimpleHTTPServer
+    - Build prod: gulp
+    - Build dev : beefy src/app.ts:app.js 8000 -- -p [ tsify ]
 3. typescript - npm install -g typescript@1.7.5 typings@0.6.6
     - typings install, in src folder
 
@@ -40,3 +39,9 @@ Adding gulp, typescript, typings, tsify, definition files! That's enough to get 
 Can't find many existing type definitions for stackgl, and it looks like beefy may struggle with gulp.
     - https://basarat.gitbooks.io/typescript/content/
     - https://blogs.msdn.microsoft.com/typescript/
+    - https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md
+
+
+####Entry 3 - WebGl pipeline
+- defer/async webgl would be ideal. a webgl web worker? three js is a retained mode wrapper
+https://blog.mozilla.org/research/2014/07/22/webgl-in-web-workers-today-and-faster-than-expected/
