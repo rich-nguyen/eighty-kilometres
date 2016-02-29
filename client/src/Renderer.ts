@@ -7,8 +7,13 @@ import { Context, Matrix } from 'stackgl'
 import { Application } from './app'
 import createContext = require('gl-context')
 import * as mat4 from 'gl-mat4'
+import fit = require('canvas-fit')
+import camera = require('canvas-orbit-camera')
 
-var fit = require('canvas-fit')
+export interface DrawUnit {
+    geometry: any
+    shader: any
+}
 
 export class Renderer {
 
@@ -24,7 +29,7 @@ export class Renderer {
         // Creates an instance of canvas-orbit-camera,
         // which later will generate a view matrix and
         // handle interaction for you.
-        this.camera = require('canvas-orbit-camera')(this.canvas);
+        this.camera = camera(this.canvas);
 
         // A small convenience function for creating
         // a new WebGL context – the `render` function
@@ -40,7 +45,7 @@ export class Renderer {
         )
     }
 
-    public render(drawUnits: any): void {
+    public render(drawUnits: DrawUnit[]): void {
 
         // Create the base matrices to be used
         // when rendering the bunny. Alternatively, can
@@ -90,20 +95,23 @@ export class Renderer {
         // being visible from behind.
         this.gl.enable(this.gl.CULL_FACE)
 
-        // Binds the geometry and sets up the shader's attribute
-        // locations accordingly.
-        drawUnits.geometry.bind(drawUnits.shader)
+        for (var drawUnit of drawUnits) {
+            
+            // Binds the geometry and sets up the shader's attribute
+            // locations accordingly.
+            drawUnit.geometry.bind(drawUnit.shader)
 
-        // Updates our model/view/projection matrices, sending them
-        // to the GPU as uniform variables that we can use in
-        // `shaders/bunny.vert` and `shaders/bunny.frag`.
-        drawUnits.shader.uniforms.uProjection = projection
-        drawUnits.shader.uniforms.uView = view
-        drawUnits.shader.uniforms.uModel = model
+            // Updates our model/view/projection matrices, sending them
+            // to the GPU as uniform variables that we can use in
+            // `shaders/bunny.vert` and `shaders/bunny.frag`.
+            drawUnit.shader.uniforms.uProjection = projection
+            drawUnit.shader.uniforms.uView = view
+            drawUnit.shader.uniforms.uModel = model
 
-        // Finally: draws the bunny to the screen! The rest is
-        // handled in our shaders.
-        drawUnits.geometry.draw(this.gl.TRIANGLES)
+            // Finally: draws the bunny to the screen! The rest is
+            // handled in our shaders.
+            drawUnit.geometry.draw(this.gl.TRIANGLES)    
+        }      
         
     }
     

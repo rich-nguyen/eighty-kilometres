@@ -1,14 +1,5 @@
-/// <reference path="ambient/typings/main.d.ts" />
-/// <reference path="ambient/stackgl.d.ts" />
 
 
-
-
-import * as mat4 from 'gl-mat4'
-
-
-
-import { Context, Matrix } from 'stackgl'
 import Renderer from './Renderer';
 import SceneManager from './SceneManager';
 
@@ -17,7 +8,6 @@ export class Application {
 
   private renderer: Renderer;
   private sceneManager: SceneManager;
-  
 
   public run(): void {
     this.sceneManager = new SceneManager();     
@@ -28,9 +18,9 @@ export class Application {
   // before they're used in our render function. It's optional
   // for you to keep `update` and `render` as separate steps.
   public update() {
-    this.sceneManager.load(this.renderer.gl);
+    this.sceneManager.loadScene(this.renderer.gl);
 
-    var drawUnits =this.sceneManager.getDrawUnit();
+    var drawUnits = this.sceneManager.getDrawUnits();
 
 
     this.renderer.render(drawUnits);

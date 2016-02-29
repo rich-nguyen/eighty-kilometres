@@ -254,6 +254,20 @@ declare module "bunny" {
     export var cells: any;
 }
 
+declare module "canvas-fit" {
+    
+    function fit(canvas: Node, parent?: any, scale?: any): any
+
+    export = fit;
+}
+
+declare module "canvas-orbit-camera" {
+
+    function attachCamera(canvas: Node, opts?: any): any
+
+    export = attachCamera;
+}
+
 declare module "stackgl" {
 
     export interface Matrix {
