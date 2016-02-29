@@ -10,6 +10,7 @@ import { Context } from 'stackgl'
 import { DrawUnit } from './Renderer'
 
 export interface Scene {
+    load(context: Context): void
     getDrawUnits(): DrawUnit[]
 }
 
@@ -18,10 +19,11 @@ export class SceneManager {
 
     public loadScene(context: Context): void {
         this.currentScene = new Bunny();
+        this.currentScene.load(context);
     }
 
     public getDrawUnits(): DrawUnit[] {
-        if (!this.currentScene) {
+        if (this.currentScene) {
             return this.currentScene.getDrawUnits()
         } else {
             return [];
