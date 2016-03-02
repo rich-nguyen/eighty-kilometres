@@ -5,7 +5,7 @@
 /// <reference path="ambient/stackgl.d.ts" />
 
 
-import { Bunny } from './scenes/Bunny'
+import { PastoralLandscape } from './scenes/PastoralLandscape'
 import { Context } from 'stackgl'
 import { DrawUnit } from './Renderer'
 
@@ -18,7 +18,7 @@ export class SceneManager {
     private currentScene: Scene;
 
     public loadScene(context: Context): void {
-        this.currentScene = new Bunny();
+        this.currentScene = new PastoralLandscape();
         this.currentScene.load(context);
     }
 
