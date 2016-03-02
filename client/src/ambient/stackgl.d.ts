@@ -268,6 +268,13 @@ declare module "canvas-orbit-camera" {
     export = attachCamera;
 }
 
+declare module "lookat-camera" {
+
+    import {LookAtCamera} from 'stackgl'
+
+    export = LookAtCamera;
+}
+
 declare module "stackgl" {
 
     export interface Matrix {
@@ -295,6 +302,14 @@ declare module "stackgl" {
         draw(triangles: any): void;
 
         constructor(context: Context);
+    }
+
+    export class LookAtCamera {
+        target: number[];
+        position: number[];
+        up: number[];
+
+        view(view: any): any;
     }
 }
 

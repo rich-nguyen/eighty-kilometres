@@ -8,7 +8,9 @@ import { Application } from './app'
 import createContext = require('gl-context')
 import * as mat4 from 'gl-mat4'
 import fit = require('canvas-fit')
-import camera = require('canvas-orbit-camera')
+
+import LookAtCamera = require('lookat-camera')
+import orbitCamera = require('canvas-orbit-camera')
 
 export interface DrawUnit {
     geometry: any
@@ -19,17 +21,19 @@ export class Renderer {
 
     public gl: Context;
     private canvas: Node;
-    private camera: any;
+
+    private lookAtCamera: LookAtCamera;
+    private orbitCamera: any;
 
     constructor() {
         // Creates a canvas element and attaches
         // it to the <body> on your DOM.hello richard, i loveyou x
         this.canvas = document.body.appendChild(document.createElement('canvas'));
 
-        // Creates an instance of canvas-orbit-camera,
-        // which later will generate a view matrix and
-        // handle interaction for you.
-        this.camera = camera(this.canvas);
+        // Creates an instance of look-at camera and orbit camera.
+        this.lookAtCamera = new LookAtCamera();
+        this.orbitCamera = orbitCamera(this.canvas);
+
 
         // A small convenience function for creating
         // a new WebGL context – the `render` function
@@ -61,12 +65,18 @@ export class Renderer {
         width = this.gl.drawingBufferWidth
         height = this.gl.drawingBufferHeight
 
-        // Updates our camera view matrix.
-        this.camera.view(view)
+        if ('using look at camera') {
+            // Updates our camera view matrix.
+            this.lookAtCamera.up = [1, 0, 0];
+            this.lookAtCamera.position = [0, 10, 0];
+            this.lookAtCamera.target = [0, 0, 0];
 
-        // Optionally, flush the state of the camera. Required
-        // for user input to work correctly.
-        this.camera.tick()
+            this.lookAtCamera.view(view);
+        } else {
+            this.orbitCamera.tick();
+            this.orbitCamera.view(view);
+        }
+
 
         // Update our projection matrix. This is the bit that's
         // responsible for taking 3D coordinates and projecting
