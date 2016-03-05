@@ -39,7 +39,7 @@ export class Renderer {
         // a new WebGL context – the `render` function
         // supplied here is called every frame to draw
         // to the screen.
-        this.gl = createContext(this.canvas, Application.app.update.bind(Application.app));
+        this.gl = createContext(this.canvas, Application.app.update);
 
         // Resizes the <canvas> to fully fit the window
         // whenever the window is resized.
@@ -66,7 +66,7 @@ export class Renderer {
         height = this.gl.drawingBufferHeight
 
         // Add the fps camera, or
-        if ('using look at camera') {
+        if (false) {
             // Updates our camera view matrix.
             this.lookAtCamera.up = [1, 0, 0];
             this.lookAtCamera.position = [0, 10, 0];

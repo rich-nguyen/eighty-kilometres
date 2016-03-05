@@ -3,7 +3,7 @@
 /// <reference path="../ambient/stackgl.d.ts" />
 /// <reference path="../ambient/typings/main.d.ts" />
 
-import { Context, Matrix } from 'stackgl'
+import { Context, Matrix, Mesh } from 'stackgl'
 import { Scene } from '../SceneManager'
 import { DrawUnit } from '../Renderer'
 import Geometry = require('gl-geometry')
@@ -19,10 +19,12 @@ export class PastoralLandscape implements Scene {
 
     private sky: any;    
 
-    private geometry: Geometry;
+    private grassGeometry: Geometry;
+
     private shader: any;
 
-    private teapot: any;
+    private teapotGeometry: Geometry;
+    private teapot: Mesh;
 
     constructor() {
         this.grassPositions = [
@@ -42,14 +44,17 @@ export class PastoralLandscape implements Scene {
         // 1. Sync loaded obj files. From the server.
             // Load the obj file into memory, and pare using parse-wavefront-obj.
             // Try basic render.
+
         //async load "http://localhost:9000/client/assets/built-assets/teapot.obj", then parse it.
-        if (!this.teapot) {
-            this.teapot = 'pending';
+        if (!this.teapot) {            
             qwest.get('http://localhost:9000/client/assets/built-assets/teapot.obj')
-                .then(function(response: any) {
-                    alert(response);
-                    this.teapot = response.responseText;
-                }.bind(this));
+                .then((response: any) => {
+                    this.teapot = parseObj(<string>response.responseText);
+                    this.teapotGeometry = new Geometry(context);
+                    this.teapotGeometry.attr('aPosition', this.teapot.positions);
+                    this.teapotGeometry.faces(this.teapot.cells);
+                    console.log(this.teapot);
+                });
         }
 
         // 2. construct shader. Needs:
@@ -63,10 +68,10 @@ export class PastoralLandscape implements Scene {
             // Depends on Light and Camera for scene
 
         // This Grass quad is inlined. for easy drawing.
-        if (!this.geometry) {            
-            this.geometry = new Geometry(context)
-            this.geometry.attr('aPosition', this.grassPositions)           
-            this.geometry.faces(this.grassCells)
+        if (!this.grassGeometry) {
+            this.grassGeometry = new Geometry(context)
+            this.grassGeometry.attr('aPosition', this.grassPositions);
+            this.grassGeometry.faces(this.grassCells);
         }
 
         if (!this.shader) {
@@ -81,15 +86,25 @@ export class PastoralLandscape implements Scene {
             this.shader = glShader(context,
                 glslify('../shaders/basic.vert')
                 , glslify('../shaders/basic.frag')
-            )
+            );
         }
     }
 
     public getDrawUnits(): DrawUnit[] {
-        return [
-        {
-            geometry: this.geometry,
-            shader: this.shader
-        }];
+        var drawUnits: DrawUnit[] = [];
+
+        /*if (this.grassGeometry) {
+            drawUnits[0] = {
+                geometry: this.grassGeometry,
+                shader: this.shader
+            };
+        }*/
+        if (this.teapotGeometry) {
+            drawUnits[0] = {
+                geometry: this.teapotGeometry,
+                shader: this.shader
+            };
+        }
+        return drawUnits;
     }
 }

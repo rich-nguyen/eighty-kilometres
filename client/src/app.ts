@@ -18,7 +18,7 @@ export class Application {
   // The logic/update loop, which updates all of the variables
   // before they're used in our render function. It's optional
   // for you to keep `update` and `render` as separate steps.
-  public update() {
+  public update = () => {
 
     var drawUnits = this.sceneManager.getDrawUnits();
     this.renderer.render(drawUnits);
