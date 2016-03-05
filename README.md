@@ -66,18 +66,18 @@ https://hacks.mozilla.org/2016/01/webgl-off-the-main-thread/
 - depth pass.
 
 #####Reading list: BRDF
-https://renderman.pixar.com/view/cook-torrance-shader
-http://simonstechblog.blogspot.co.uk/2011/12/microfacet-brdf.html
-http://graphicrants.blogspot.co.uk/2013/08/specular-brdf-reference.html
-http://dontnormalize.me/tag/cook-torrance/
+- https://renderman.pixar.com/view/cook-torrance-shader
+- http://simonstechblog.blogspot.co.uk/2011/12/microfacet-brdf.html
+- http://graphicrants.blogspot.co.uk/2013/08/specular-brdf-reference.html
+- http://dontnormalize.me/tag/cook-torrance/
 
 #####Reading list: General
-http://www.valvesoftware.com/publications/2006/SIGGRAPH06_Course_ShadingInValvesSourceEngine.pdf
-https://unity3d.com/learn/tutorials/modules/beginner/graphics/lighting-and-rendering
+- http://www.valvesoftware.com/publications/2006/SIGGRAPH06_Course_ShadingInValvesSourceEngine.pdf
+- https://unity3d.com/learn/tutorials/modules/beginner/graphics/lighting-and-rendering
 
 #####Reading list: Deferred shading
-https://hacks.mozilla.org/2014/01/webgl-deferred-shading/
-http://codeflow.org/entries/2012/aug/25/webgl-deferred-irradiance-volumes/
-http://learnopengl.com/#!Advanced-Lighting/Deferred-Shading
-http://www.slideshare.net/guerrillagames/deferred-rendering-in-killzone-2-9691589
+- https://hacks.mozilla.org/2014/01/webgl-deferred-shading/
+- http://codeflow.org/entries/2012/aug/25/webgl-deferred-irradiance-volumes/
+- http://learnopengl.com/#!Advanced-Lighting/Deferred-Shading
+- http://www.slideshare.net/guerrillagames/deferred-rendering-in-killzone-2-9691589
 
