@@ -1,3 +1,5 @@
 GET        /                                   controllers.WorldViewController.index()
 
 GET        /client/allotments/plan.json        controllers.WorldViewController.allotmentPlan()
+
+GET        /client/assets/*path                controllers.AssetContentController.loadAsset(path)

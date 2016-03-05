@@ -20,11 +20,13 @@ object EightyKilometres extends Build {
     val awsVersion = "1.10.44"
     val awsDynamodb = "com.amazonaws" % "aws-java-sdk-dynamodb" % awsVersion
     val awsCore = "com.amazonaws" % "aws-java-sdk-core" % awsVersion
+    val commonsIo = "commons-io" % "commons-io" % "2.4"
 
     val dependencies =  Seq(
       libraryDependencies ++= Seq(
         awsCore,
-        awsDynamodb
+        awsDynamodb,
+        commonsIo
       )
     )
 
