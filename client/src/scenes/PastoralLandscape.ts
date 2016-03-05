@@ -33,7 +33,11 @@ export class PastoralLandscape implements Scene {
 
     public load(context: Context): void {
 
-        // construct shader. Needs:
+        // 1. Sync loaded obj files. From the server.
+            // Load the obj file into memory, and pare using parse-wavefront-obj.
+            // Try basic render.
+
+        // 2. construct shader. Needs:
             // a list of vertices,
             // a list of indices for drawing.
             // uniforms for light,
@@ -43,6 +47,7 @@ export class PastoralLandscape implements Scene {
 
             // Depends on Light and Camera for scene
 
+        // This Grass quad is inlined. for easy drawing.
         if (!this.geometry) {            
             this.geometry = new Geometry(context)
             this.geometry.attr('aPosition', this.grassPositions)           

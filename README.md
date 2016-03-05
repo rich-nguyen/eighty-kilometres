@@ -46,6 +46,7 @@ Can't find many existing type definitions for stackgl, and it looks like beefy m
 Async webgl would be ideal. a webgl web worker? three js is a retained mode wrapper
 - https://blog.mozilla.org/research/2014/07/22/webgl-in-web-workers-today-and-faster-than-expected/
 - https://hacks.mozilla.org/2016/01/webgl-off-the-main-thread/
+- Set extensions using webglew
 
 ####Entry 4 - Shading wishlist
 
@@ -54,7 +55,7 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 - BRDF surface shader. Oren-Nayar, Cook-Torrance.
 - shadows. Variance shadow maps.
 - Anti aliasing.
-- Sky box.
+- Sky box. gl-skybox
 - Deferred shading, G Buffers. Tiled shader is more performant.
 - Bloom.
 - Web worker.

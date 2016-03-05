@@ -65,6 +65,7 @@ export class Renderer {
         width = this.gl.drawingBufferWidth
         height = this.gl.drawingBufferHeight
 
+        // Add the fps camera, or
         if ('using look at camera') {
             // Updates our camera view matrix.
             this.lookAtCamera.up = [1, 0, 0];
