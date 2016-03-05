@@ -37,15 +37,15 @@ add canvas-loop
 
 Adding gulp, typescript, typings, tsify, definition files! That's enough to get type annotations when rendering stuff.
 Can't find many existing type definitions for stackgl, and it looks like beefy may struggle with gulp.
-    - https://basarat.gitbooks.io/typescript/content/
-    - https://blogs.msdn.microsoft.com/typescript/
-    - https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md
+- https://basarat.gitbooks.io/typescript/content/
+- https://blogs.msdn.microsoft.com/typescript/
+- https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md
 
 
 ####Entry 3 - WebGl Threading
-- Async webgl would be ideal. a webgl web worker? three js is a retained mode wrapper
-https://blog.mozilla.org/research/2014/07/22/webgl-in-web-workers-today-and-faster-than-expected/
-https://hacks.mozilla.org/2016/01/webgl-off-the-main-thread/
+Async webgl would be ideal. a webgl web worker? three js is a retained mode wrapper
+- https://blog.mozilla.org/research/2014/07/22/webgl-in-web-workers-today-and-faster-than-expected/
+- https://hacks.mozilla.org/2016/01/webgl-off-the-main-thread/
 
 ####Entry 4 - Shading wishlist
 
