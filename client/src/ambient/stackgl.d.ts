@@ -284,6 +284,32 @@ declare module "stackgl" {
         [index: number]: number;
     }
 
+    type Vector3 = [number, number, number];
+    type Index3 = [number, number, number];
+    type Index4 = [number, number, number, number];
+    type UV = [number, number];
+
+    export interface Mesh {
+
+        // The vertex positions, as xyz arrays. Arrays of 3 floats.
+        positions: Vector3[];
+
+        // The triangles of the mesh. Indexes refer to positions array. Arrays of 3 index values.
+        cells: Index3[];
+
+        // Each cell may have a normal vector. Arrays of 3 index values.
+        faceNormals?: Index3[];
+
+        // Each vertex may have a normal vector. Arrays of 3 floats.
+        vertexNormals?: Vector3[];
+
+        // Unique UV values. Arrays of 2 UV floats (0 - 1.0).
+        vertexUVs?: UV[];
+
+        // The UVs for each face. Indexes refer to vertexUVs array. Arrays of 4 index values.
+        faceUVs?: Index4[];
+    }
+
     export class Context {
         drawingBufferWidth: number;
         drawingBufferHeight: number;
@@ -331,7 +357,9 @@ declare module "gl-geometry" {
 
 declare module "parse-wavefront-obj" {
 
-    function parse(objContent: string): any
+    import {Mesh} from 'stackgl'
+
+    function parse(objContent: string): Mesh
     export = parse;
 }
 
