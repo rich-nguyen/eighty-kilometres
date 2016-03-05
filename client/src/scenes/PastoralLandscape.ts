@@ -1,12 +1,16 @@
 // A Pastoral Landscape
 
-import Geometry = require('gl-geometry')
+/// <reference path="../ambient/stackgl.d.ts" />
+/// <reference path="../ambient/typings/main.d.ts" />
+
 import { Context, Matrix } from 'stackgl'
-var glShader = require('gl-shader')
-var normals = require('normals')
-var glslify = require('glslify')
 import { Scene } from '../SceneManager'
 import { DrawUnit } from '../Renderer'
+import Geometry = require('gl-geometry')
+import glShader = require('gl-shader')
+import glslify = require('glslify')
+import parseObj = require('parse-wavefront-obj')
+import qwest = require('qwest')
 
 export class PastoralLandscape implements Scene {
     
@@ -17,6 +21,8 @@ export class PastoralLandscape implements Scene {
 
     private geometry: Geometry;
     private shader: any;
+
+    private teapot: any;
 
     constructor() {
         this.grassPositions = [
@@ -36,6 +42,15 @@ export class PastoralLandscape implements Scene {
         // 1. Sync loaded obj files. From the server.
             // Load the obj file into memory, and pare using parse-wavefront-obj.
             // Try basic render.
+        //async load "http://localhost:9000/client/assets/built-assets/teapot.obj", then parse it.
+        if (!this.teapot) {
+            this.teapot = 'pending';
+            qwest.get('http://localhost:9000/client/assets/built-assets/teapot.obj')
+                .then(function(response: any) {
+                    alert(response);
+                    this.teapot = response.responseText;
+                }.bind(this));
+        }
 
         // 2. construct shader. Needs:
             // a list of vertices,

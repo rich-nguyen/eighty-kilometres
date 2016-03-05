@@ -328,3 +328,24 @@ declare module "gl-geometry" {
 
     export = Geometry;
 }
+
+declare module "parse-wavefront-obj" {
+
+    function parse(objContent: string): any
+    export = parse;
+}
+
+declare module "gl-shader" {
+
+    import {Context} from 'stackgl'
+
+    function createShader(context: Context, vertexShader: any, fragmentShader: any): any;
+
+    export = createShader;
+}
+
+declare module "glslify" {
+
+    function transform(filename: string, browserifyOpts?: any): any;
+    export = transform;
+}

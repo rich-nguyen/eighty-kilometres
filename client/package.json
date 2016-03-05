@@ -22,6 +22,7 @@
     "lookat-camera": "^1.0.0",
     "normals": "^0.1.0",
     "parse-wavefront-obj": "^1.0.1",
+    "qwest": "^4.1.1",
     "tsify": "^0.13.2",
     "vinyl-source-stream": "^1.1.0"
   },
