@@ -6,6 +6,8 @@
 *.iml
 *.box
 *.log
+*.mtl
+*.swatches
 
 .DS_Store
 .idea
