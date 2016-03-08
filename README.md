@@ -82,3 +82,6 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 - http://learnopengl.com/#!Advanced-Lighting/Deferred-Shading
 - http://www.slideshare.net/guerrillagames/deferred-rendering-in-killzone-2-9691589
 
+####Entry 5 - Modelling
+Get the wacom out. https://www.youtube.com/watch?v=OFBmg-N41gs
+
