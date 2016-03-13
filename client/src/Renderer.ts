@@ -69,8 +69,8 @@ export class Renderer {
         if (false) {
             // Updates our camera view matrix.
             this.lookAtCamera.up = [1, 0, 0];
-            this.lookAtCamera.position = [0, 10, 0];
-            this.lookAtCamera.target = [0, 0, 0];
+            this.lookAtCamera.position = [0, 5, 0];
+            this.lookAtCamera.target = [-100, 10, 0];
 
             this.lookAtCamera.view(view);
         } else {
@@ -85,7 +85,7 @@ export class Renderer {
         var aspectRatio = this.gl.drawingBufferWidth / this.gl.drawingBufferHeight
         var fieldOfView = Math.PI / 4
         var near = 0.01
-        var far = 100
+        var far = 1000
 
         mat4.perspective(projection
             , fieldOfView
