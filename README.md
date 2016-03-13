@@ -84,4 +84,5 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 
 ####Entry 5 - Modelling
 Get the wacom out. https://www.youtube.com/watch?v=OFBmg-N41gs
+First MEL command in a while: worldspace translation for transform: xform -q -t -ws "sceneCamera1aim" 
 
