@@ -32,8 +32,7 @@ export class Renderer {
 
         // Creates an instance of look-at camera and orbit camera.
         this.lookAtCamera = new LookAtCamera();
-        this.orbitCamera = orbitCamera(this.canvas);
-
+        this.orbitCamera = orbitCamera(this.canvas);      
 
         // A small convenience function for creating
         // a new WebGL context – the `render` function
@@ -65,13 +64,19 @@ export class Renderer {
         width = this.gl.drawingBufferWidth
         height = this.gl.drawingBufferHeight
 
-        // Add the fps camera, or
+        // Use the lookat/orbit camera
         if (false) {
+        } else if(true) {
             // Updates our camera view matrix.
-            this.lookAtCamera.up = [1, 0, 0];
-            this.lookAtCamera.position = [0, 5, 0];
-            this.lookAtCamera.target = [-100, 10, 0];
+            this.lookAtCamera.up = [0, 1, 0];
 
+            // from MEL: xform - q - t - ws sceneCamera1;
+            // Result: -136.467167 222.846198 -302.588741
+            this.lookAtCamera.position = [-136.467167, 222.846198, -302.588741];
+
+            // from MEL: xform - q - t - ws "sceneCamera1aim";
+            // Result: -326.315692 117.583301 -172.69315 
+            this.lookAtCamera.target = [-326.315692, 117.583301, -172.69315];
             this.lookAtCamera.view(view);
         } else {
             this.orbitCamera.tick();
@@ -79,13 +84,22 @@ export class Renderer {
         }
 
 
-        // Update our projection matrix. This is the bit that's
+        // Update our pespective projection matrix. This is the bit that's
         // responsible for taking 3D coordinates and projecting
-        // them into 2D screen space.
-        var aspectRatio = this.gl.drawingBufferWidth / this.gl.drawingBufferHeight
-        var fieldOfView = Math.PI / 4
-        var near = 0.01
-        var far = 1000
+        // them into 2D screen space.        
+        var aspectRatio = this.gl.drawingBufferWidth / this.gl.drawingBufferHeight;
+
+        // from MEL: getAttr sceneCamera1.focalLength
+        // Result: 21 
+        var fieldOfView = 1.4171; // 81.2 degrees in radians, or focal length 21.
+
+        // from MEL: getAttr sceneCamera1.nearClipPlane;
+        // Result: 1 // 
+        var near = 1.0;
+        
+        // from MEL: getAttr sceneCamera1.farClipPlane;
+        // Result: 600 // 
+        var far = 600.0;
 
         mat4.perspective(projection
             , fieldOfView
@@ -115,12 +129,10 @@ export class Renderer {
             // Updates our model/view/projection matrices, sending them
             // to the GPU as uniform variables that we can use in
             // `shaders/bunny.vert` and `shaders/bunny.frag`.
-            drawUnit.shader.uniforms.uProjection = projection
-            drawUnit.shader.uniforms.uView = view
-            drawUnit.shader.uniforms.uModel = model
+            drawUnit.shader.uniforms.uProjection = projection;
+            drawUnit.shader.uniforms.uView = view;
+            drawUnit.shader.uniforms.uModel = model;
 
-            // Finally: draws the bunny to the screen! The rest is
-            // handled in our shaders.
             drawUnit.geometry.draw(this.gl.TRIANGLES)    
         }      
         
