@@ -47,7 +47,7 @@ export class PastoralLandscape implements Scene {
 
         //async load "http://localhost:9000/client/assets/built-assets/teapot.obj", then parse it.
         if (!this.teapot) {            
-            qwest.get('http://localhost:9000/client/assets/built-assets/teapot.obj')
+            qwest.get('http://localhost:9000/client/assets/built-assets/floorplan.obj')
                 .then((response: any) => {
                     this.teapot = parseObj(<string>response.responseText);
                     this.teapotGeometry = new Geometry(context);
