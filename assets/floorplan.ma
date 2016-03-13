@@ -1,6 +1,6 @@
 //Maya ASCII 2015 scene
 //Name: floorplan.ma
-//Last modified: Sat, Mar 12, 2016 09:55:55 PM
+//Last modified: Sun, Mar 13, 2016 01:49:45 PM
 //Codeset: UTF-8
 requires maya "2015";
 currentUnit -l centimeter -a degree -t film;
@@ -11,8 +11,8 @@ fileInfo "cutIdentifier" "201405190330-916664";
 fileInfo "osv" "Mac OS X 10.9.2";
 createNode transform -s -n "persp";
 	setAttr ".v" no;
-	setAttr ".t" -type "double3" 673.34563025713783 1171.607516336313 -198.51235263761077 ;
-	setAttr ".r" -type "double3" -39.938352615858179 4046.5999999978881 -1.0725844416762125e-13 ;
+	setAttr ".t" -type "double3" 863.19136931159858 889.10292550573399 -292.78755585378167 ;
+	setAttr ".r" -type "double3" -27.338352614828118 4050.9999999976071 1.0177774980683254e-13 ;
 	setAttr ".rp" -type "double3" 2.8421709430404007e-13 3.765876499528531e-13 1.8189894035458565e-12 ;
 	setAttr ".rpt" -type "double3" -1.0415291745790113e-12 1.2161952261407637e-12 -1.4622478367515913e-12 ;
 createNode camera -s -n "perspShape" -p "persp";
@@ -528,7 +528,7 @@ createNode polySplit -n "polySplit34";
 	setAttr ".m2015" yes;
 createNode polyTweak -n "polyTweak2";
 	setAttr ".uopa" yes;
-	setAttr -s 182 ".tk";
+	setAttr -s 19 ".tk";
 	setAttr ".tk[38]" -type "float3" 0 0 1.839447 ;
 	setAttr ".tk[40]" -type "float3" 0 0 0.029703617 ;
 	setAttr ".tk[90]" -type "float3" 0 0 0.029703617 ;
@@ -735,6 +735,8 @@ createNode polyMergeVert -n "polyMergeVert8";
 createNode polyTweak -n "polyTweak10";
 	setAttr ".uopa" yes;
 	setAttr ".tk[330]" -type "float3"  8.079040527 -0.18777466 1.5258789e-05;
+createNode polyTriangulate -n "polyTriangulate1";
+	setAttr ".ics" -type "componentList" 1 "f[*]";
 select -ne :time1;
 	setAttr ".o" 1;
 	setAttr ".unw" 1;
@@ -765,7 +767,7 @@ select -ne :defaultHardwareRenderGlobals;
 connectAttr "cameraView1.msg" ":perspShape.b" -na;
 connectAttr "Reference_Image.di" "imagePlane1.do";
 connectAttr ":topShape.msg" "imagePlaneShape1.ltc";
-connectAttr "polyMergeVert8.out" "pPlaneShape1.i";
+connectAttr "polyTriangulate1.out" "pPlaneShape1.i";
 connectAttr "groupId1.id" "pPlaneShape1.iog.og[0].gid";
 connectAttr "set1.mwc" "pPlaneShape1.iog.og[0].gco";
 connectAttr "locatorShape1.wp" "distanceDimensionShape1.sp";
@@ -907,6 +909,7 @@ connectAttr "polyMergeVert6.out" "polyTweak9.ip";
 connectAttr "polyTweak10.out" "polyMergeVert8.ip";
 connectAttr "pPlaneShape1.wm" "polyMergeVert8.mp";
 connectAttr "polyMergeVert7.out" "polyTweak10.ip";
+connectAttr "polyMergeVert8.out" "polyTriangulate1.ip";
 connectAttr "defaultRenderLayer.msg" ":defaultRenderingList1.r" -na;
 connectAttr "pPlaneShape1.iog" ":initialShadingGroup.dsm" -na;
 dataStructure -fmt "raw" -as "name=externalContentTable:string=node:string=key:string=upath:uint32=upathcrc:string=rpath:string=roles";
