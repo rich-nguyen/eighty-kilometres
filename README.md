@@ -59,6 +59,7 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 - Deferred shading, G Buffers. Tiled shader is more performant.
 - Bloom.
 - Web worker.
+- DevicePixelRatio = 0.7 render, then use css as upscaler. https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices
 
 #####Deferred Passes
 - direct illumination.
@@ -77,10 +78,12 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 - https://unity3d.com/learn/tutorials/modules/beginner/graphics/lighting-and-rendering
 
 #####Reading list: Deferred shading
+Remeber, deferred shading is possible with WebGL 1.0, but you would have to write a single texture (eg. color & depth, then normals) per pass.
 - https://hacks.mozilla.org/2014/01/webgl-deferred-shading/
 - http://codeflow.org/entries/2012/aug/25/webgl-deferred-irradiance-volumes/
 - http://learnopengl.com/#!Advanced-Lighting/Deferred-Shading
 - http://www.slideshare.net/guerrillagames/deferred-rendering-in-killzone-2-9691589
+- https://github.com/tiansijie/DeferredShader
 
 ####Entry 5 - Modelling
 - Get the wacom out. https://www.youtube.com/watch?v=OFBmg-N41gs
