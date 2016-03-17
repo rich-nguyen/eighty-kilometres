@@ -339,6 +339,12 @@ declare module "stackgl" {
 
         view(view: any): any;
     }
+
+    export class Shader {        
+        vertShader: WebGLShader;
+        fragShader: WebGLShader;
+        program: WebGLProgram;        
+    }
 }
 
 declare module "gl-context" {
@@ -367,9 +373,9 @@ declare module "parse-wavefront-obj" {
 
 declare module "gl-shader" {
 
-    import {Context} from 'stackgl'
+    import {Context, Shader} from 'stackgl'
 
-    function createShader(context: Context, vertexShader: WebGLShader, fragmentShader: WebGLShader): WebGLProgram;
+    function createShader(context: Context, vertexShader: WebGLShader, fragmentShader: WebGLShader): Shader;
 
     export = createShader;
 }

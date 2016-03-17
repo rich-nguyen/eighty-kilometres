@@ -51,7 +51,9 @@ export class PastoralLandscape implements Scene {
                 .then((response: any) => {
                     this.teapot = parseObj(<string>response.responseText);
                     this.teapotGeometry = new Geometry(context);
-                    this.teapotGeometry.attr('aPosition', this.teapot.positions);
+                    this.teapotGeometry.attr('Position', this.teapot.positions);
+                    this.teapotGeometry.attr('Normal', this.teapot.positions);
+                    this.teapotGeometry.attr('Texcoord', this.teapot.positions);
                     this.teapotGeometry.faces(this.teapot.cells);                    
                 });
         }

@@ -4,7 +4,7 @@
 /// <reference path="ambient/typings/main.d.ts" />
 /// <reference path="ambient/stackgl.d.ts" />
 
-import { Context, Matrix } from 'stackgl'
+import { Context, Matrix, Shader } from 'stackgl'
 import { Application } from './app'
 import createContext = require('gl-context')
 import * as mat4 from 'gl-mat4'
@@ -19,7 +19,7 @@ import orbitCamera = require('canvas-orbit-camera')
 
 export interface DrawUnit {
     geometry: any
-    shader: WebGLProgram
+    shader: Shader
 }
 
 export enum DisplayType {
@@ -36,8 +36,8 @@ export class Renderer {
     private canvas: Node;
     private frameBuffer: WebGLFramebuffer;
     
-    private pass_prog: WebGLProgram;
-    private diagnostic_prog: WebGLProgram;
+    private pass_prog: Shader;
+    private diagnostic_prog: Shader;
 
     private diagnosticLocs: WebGLUniformLocation[];
     private diagnosticLoc_Light: WebGLUniformLocation;
@@ -91,6 +91,9 @@ export class Renderer {
             console.log("Extension Depth texture is not supported in this browser.");       
         }
 
+        this.gl.getExtension("OES_texture_float");
+        this.gl.getExtension("OES_texture_float_linear");
+
         // Create and bind framebuffer object.
         this.frameBuffer = this.gl.createFramebuffer();
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
@@ -100,6 +103,37 @@ export class Renderer {
         this.colorTexture = this.gl.createTexture();
         this.positionTexture = this.gl.createTexture();
         this.depthRGBTexture = this.gl.createTexture();
+
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.normalTexture);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
+
+
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.positionTexture);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
+
+
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.colorTexture);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
+
+
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.depthRGBTexture);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
 
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT0_WEBGL, this.gl.TEXTURE_2D, this.normalTexture, 0);
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT1_WEBGL, this.gl.TEXTURE_2D, this.colorTexture, 0);
@@ -133,17 +167,6 @@ export class Renderer {
             glslify('./shaders/deferred/first-pass.frag')
         );
 
-        this.positionLocation = this.gl.getAttribLocation(this.pass_prog, "Position");
-        this.normalLocation = this.gl.getAttribLocation(this.pass_prog, "Normal");
-        this.texCoordLocation = this.gl.getAttribLocation(this.pass_prog, "Texcoord");
-
-        //var u_textureLocation: WebGLUniformLocation = this.gl.getUniformLocation(this.pass_prog, "u_Texutre");
-
-        this.u_ModelLocation = this.gl.getUniformLocation(this.pass_prog, "u_Model");
-        this.u_ViewLocation = this.gl.getUniformLocation(this.pass_prog, "u_View");
-        this.u_PerspLocation = this.gl.getUniformLocation(this.pass_prog, "u_Persp");
-        this.u_InvTransLocation = this.gl.getUniformLocation(this.pass_prog, "u_InvTrans");
-        this.u_ColorSamplerLocation = this.gl.getUniformLocation(this.pass_prog, "u_ColorSampler");
 
         this.diagnostic_prog = glShader(this.gl,
             glslify('./shaders/deferred/second-pass.vert'),
@@ -156,51 +179,9 @@ export class Renderer {
         this.quad_texCoordLocation = 1;
         
 
-        this.gl.bindAttribLocation(this.diagnostic_prog, this.quad_positionLocation, "Position");
-        this.gl.bindAttribLocation(this.diagnostic_prog, this.quad_texCoordLocation, "Texcoord");
+        
 
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog, "u_DisplayType"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog, "u_Near"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog, "u_Far"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog, "u_Width"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog, "u_Height"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog, "u_Depthtex"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog, "u_Normaltex"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog, "u_Positiontex"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog, "u_Colortex"));
-
-        this.diagnosticLoc_Light = this.gl.getUniformLocation(this.diagnostic_prog, "u_Light");
-
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.normalTexture);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
-
-
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.positionTexture);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
-
-
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.colorTexture);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
-
-
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.depthRGBTexture);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
+        
         
         this.display_type = DisplayType.Depth;     
 
@@ -311,6 +292,18 @@ export class Renderer {
                 //drawUnit.geometry.bind(drawUnit.shader)
                 drawUnit.geometry.bind(this.pass_prog);
 
+                this.positionLocation = this.gl.getAttribLocation(this.pass_prog.program, "Position");
+                this.normalLocation = this.gl.getAttribLocation(this.pass_prog.program, "Normal");
+                this.texCoordLocation = this.gl.getAttribLocation(this.pass_prog.program, "Texcoord");
+
+                //var u_textureLocation: WebGLUniformLocation = this.gl.getUniformLocation(this.pass_prog.program, "u_Texutre");
+
+                this.u_ModelLocation = this.gl.getUniformLocation(this.pass_prog.program, "u_Model");
+                this.u_ViewLocation = this.gl.getUniformLocation(this.pass_prog.program, "u_View");
+                this.u_PerspLocation = this.gl.getUniformLocation(this.pass_prog.program, "u_Persp");
+                this.u_InvTransLocation = this.gl.getUniformLocation(this.pass_prog.program, "u_InvTrans");
+                this.u_ColorSamplerLocation = this.gl.getUniformLocation(this.pass_prog.program, "u_ColorSampler");
+
                 //function setMatrixUniforms(model)
                 {
                     this.gl.uniformMatrix4fv(this.u_ModelLocation, false, model);
@@ -352,7 +345,7 @@ export class Renderer {
 
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         
-        drawMesh();        
+        drawMesh.bind(this)();        
 
         //Second Pass
 
@@ -367,7 +360,22 @@ export class Renderer {
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
         this.gl.bindTexture(this.gl.TEXTURE_2D, null);
 
-        this.gl.useProgram(this.diagnostic_prog);
+        this.gl.useProgram(this.diagnostic_prog.program);
+
+        this.gl.bindAttribLocation(this.diagnostic_prog.program, this.quad_positionLocation, "Position");
+        this.gl.bindAttribLocation(this.diagnostic_prog.program, this.quad_texCoordLocation, "Texcoord");
+
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_DisplayType"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Near"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Far"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Width"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Height"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Depthtex"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Normaltex"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Positiontex"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Colortex"));
+
+        this.diagnosticLoc_Light = this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Light");
 
 
         // Typescript Enum!!
