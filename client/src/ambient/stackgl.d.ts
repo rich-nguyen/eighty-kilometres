@@ -1,4 +1,15 @@
 
+declare module "gl-vec3" {
+
+    import { Matrix } from "stackgl"
+
+    export function create(init?: any): any;
+
+    //transformMat4(out:vec3, a:vec3, m:mat4)
+    export function transformMat4(out: any, a: any, m: Matrix): any;
+
+}
+
 declare module "gl-mat4" {
 
     import { Matrix } from "stackgl"
@@ -310,16 +321,7 @@ declare module "stackgl" {
         faceUVs?: Index4[];
     }
 
-    export class Context {
-        drawingBufferWidth: number;
-        drawingBufferHeight: number;
-        viewport(top: number, left: number, right: number, bottom: number): void;
-        enable(setting: any): void;
-
-        DEPTH_TEST: any;
-        CULL_FACE: any;
-        TRIANGLES: any;
-    }
+    export type Context = WebGLRenderingContext;    
 
     export class Geometry {
         attr(name: any, attr: any, opts?: any): Geometry;
@@ -367,7 +369,7 @@ declare module "gl-shader" {
 
     import {Context} from 'stackgl'
 
-    function createShader(context: Context, vertexShader: any, fragmentShader: any): any;
+    function createShader(context: Context, vertexShader: WebGLShader, fragmentShader: WebGLShader): WebGLProgram;
 
     export = createShader;
 }
