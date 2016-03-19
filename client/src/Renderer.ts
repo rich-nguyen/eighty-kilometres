@@ -64,6 +64,10 @@ export class Renderer {
     private lookAtCamera: LookAtCamera;
     private orbitCamera: any;
 
+    private device_quad: any;
+    private vbo_vertices: any;
+    private vbo_indices: any;
+    private vbo_textures: any;
 
     constructor() {
         // Creates a canvas element and attaches
@@ -178,10 +182,35 @@ export class Renderer {
         this.quad_positionLocation = 0;
         this.quad_texCoordLocation = 1;
         
+        var positions = new Float32Array([
+            -1.0, 1.0, 0.0,
+            -1.0, -1.0, 0.0,
+            1.0, -1.0, 0.0,
+            1.0, 1.0, 0.0
+        ]);
 
-        
+        var textures = new Float32Array([
+            -1.0, 1.0,
+            -1.0, -1.0,
+            1.0, -1.0,
+            1.0, 1.0
+        ]);
 
-        
+        this.device_quad = { num_indices: 0 };
+        var indices = [0, 1, 2, 0, 2, 3];
+        this.device_quad.num_indices = 6;
+
+        this.vbo_vertices = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo_vertices);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.STATIC_DRAW);
+
+        this.vbo_textures = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo_textures);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(textures), this.gl.STATIC_DRAW);
+
+        this.vbo_indices = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.vbo_indices);
+        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);        
         
         this.display_type = DisplayType.Depth;     
 
@@ -328,6 +357,7 @@ export class Renderer {
         //Draw time!
 
         //First Pass
+        //----------
 
         //Sort Camera out.
 
@@ -348,6 +378,7 @@ export class Renderer {
         drawMesh.bind(this)();        
 
         //Second Pass
+        //-----------
 
         //should unbind Textures using setTextures();
 
@@ -410,6 +441,21 @@ export class Renderer {
         vec3.transformMat4(view, lightPos, lightdest);        
 
         this.gl.uniform3fv(this.diagnosticLoc_Light, lightdest); 
+
+        this.gl.enableVertexAttribArray(this.quad_positionLocation);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo_vertices);
+        this.gl.vertexAttribPointer(this.quad_positionLocation, 3, this.gl.FLOAT, false, 0, 0);
+
+        this.gl.enableVertexAttribArray(this.quad_texCoordLocation);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo_textures);
+        this.gl.vertexAttribPointer(this.quad_texCoordLocation, 2, this.gl.FLOAT, false, 0, 0);
+
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.vbo_indices);
+
+        this.gl.drawElements(this.gl.TRIANGLES, this.device_quad.num_indices, this.gl.UNSIGNED_SHORT, 0);
+
+        this.gl.disableVertexAttribArray(this.quad_positionLocation);
+        this.gl.disableVertexAttribArray(this.quad_texCoordLocation);
 
         //drawQuad()
         // ie bind then draw elements. This quad is a screen space quad! It fills entire screen to cause a full redraw.
