@@ -31,7 +31,9 @@ Model formatting is another thing to skip around. Try asset import?
 
 Conclusion: Try stack.gl. it's small and modular, shader-oriented.
 
-add canvas-loop
+- add stack gl canvas-loop
+
+Debugging: Try http://google.github.io/tracing-framework/analyzing-traces.html
 
 ####Entry 2 - Prepping the codebase
 
