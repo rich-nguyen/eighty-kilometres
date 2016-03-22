@@ -11,7 +11,8 @@ precision highp float;
 uniform sampler2D u_Depthtex;
 uniform sampler2D u_Normaltex;
 uniform sampler2D u_Positiontex;
-uniform sampler2D u_Colortex;  
+uniform sampler2D u_Colortex; 
+uniform sampler2D u_Debugtex;
 uniform int u_DisplayType;
 uniform float u_Far;
 uniform float u_Near;
@@ -33,27 +34,28 @@ void main(void)
     vec3 normal = normalize(texture2D(u_Normaltex, fs_Texcoord).xyz);
     vec3 position = texture2D(u_Positiontex, fs_Texcoord).xyz;
     vec3 color = texture2D(u_Colortex, fs_Texcoord).xyz;
+    vec3 debug = texture2D(u_Debugtex,fs_Texcoord).xyz;
     
     vec3 light = u_Light.xyz;//.position.xyz;
     //u_Light.xyz;
     float diffuse = abs(dot(normal, normalize(light - position)));
     //max(dot(normal, normalize(light - position)),0.0);
-    if(u_DisplayType == DISPLAY_DEPTH)
-        gl_FragColor = vec4(vec3(lin_depth) * 30.0, 1.0);
-    else if(u_DisplayType == DISPLAY_NORMAL)
-        gl_FragColor = vec4(abs(normal), 1.0);
-    else if(u_DisplayType == DISPLAY_POSITION)
-        gl_FragColor = vec4(abs(position)/u_Far * 120.0, 1.0);
-    else if(u_DisplayType == DISPLAY_COLOR){
-        //gl_FragColor = vec4(color, 1.0);
-        gl_FragColor = vec4(color, 1.0);
-    }
-    else if(u_DisplayType == DISPLAY_TOTAL)
-    {
+    //if(u_DisplayType == DISPLAY_DEPTH)
+        //gl_FragColor = vec4(vec3(lin_depth) * 30.0, 1.0);        
+    //else if(u_DisplayType == DISPLAY_NORMAL)
+   //     gl_FragColor = vec4(abs(normal), 1.0);
+    //else if(u_DisplayType == DISPLAY_POSITION)
+   //     gl_FragColor = vec4(abs(position)/u_Far * 120.0, 1.0);
+   // else if(u_DisplayType == DISPLAY_COLOR){
+        gl_FragColor = vec4(color, 1.0);    
+   // }
+    //else if(u_DisplayType == DISPLAY_TOTAL)
+    //{
         // if(diffuse == 0.0)
         //     diffuse = dot(-normal, normalize(light - position));
-        gl_FragColor = vec4(diffuse * color , 1.0);                          
-    }
-    else
-        gl_FragColor = vec4(vec3(0.0), 1.0);   
+   //     gl_FragColor = vec4(diffuse * color , 1.0);                          
+   // }
+   // else
+        // Pink screen for error.
+        //gl_FragColor = vec4(vec3(1.0, 0.5, 0.8), 1.0);   
 }

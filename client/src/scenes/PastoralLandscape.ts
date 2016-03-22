@@ -52,9 +52,9 @@ export class PastoralLandscape implements Scene {
                     this.teapot = parseObj(<string>response.responseText);
                     this.teapotGeometry = new Geometry(context);
                     this.teapotGeometry.attr('Position', this.teapot.positions);
-                    this.teapotGeometry.attr('Normal', this.teapot.positions);
-                    this.teapotGeometry.attr('Texcoord', this.teapot.positions);
-                    this.teapotGeometry.faces(this.teapot.cells);                    
+                    this.teapotGeometry.attr('Normal', this.teapot.vertexNormals);
+                    this.teapotGeometry.attr('Texcoord', this.teapot.vertexUVs);                    
+                    this.teapotGeometry.faces(this.teapot.cells);
                 });
         }
 
@@ -71,11 +71,11 @@ export class PastoralLandscape implements Scene {
         // This Grass quad is inlined. for easy drawing.
         if (!this.grassGeometry) {
             this.grassGeometry = new Geometry(context)
-            this.grassGeometry.attr('aPosition', this.grassPositions);
+            this.grassGeometry.attr('Position', this.grassPositions);
             this.grassGeometry.faces(this.grassCells);
         }
 
-        if (!this.shader) {
+        /*if (!this.shader) {
             // Pulls up our shader code and returns an instance
             // of gl-shader. Using the glslify browserify transform,
             // these will be passed through glslify first to pull in
@@ -88,7 +88,7 @@ export class PastoralLandscape implements Scene {
                 glslify('../shaders/basic.vert')
                 , glslify('../shaders/basic.frag')
             );
-        }
+        }*/
     }
 
     public getDrawUnits(): DrawUnit[] {
@@ -103,7 +103,7 @@ export class PastoralLandscape implements Scene {
         if (this.teapotGeometry) {
             drawUnits[0] = {
                 geometry: this.teapotGeometry,
-                shader: this.shader
+                shader: null
             };
         }
         return drawUnits;

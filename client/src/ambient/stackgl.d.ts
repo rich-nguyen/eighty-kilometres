@@ -5,6 +5,8 @@ declare module "gl-vec3" {
 
     export function create(init?: any): any;
 
+    export function set(vec: any, x: number, y: number, z: number): void;
+
     //transformMat4(out:vec3, a:vec3, m:mat4)
     export function transformMat4(out: any, a: any, m: Matrix): any;
 
@@ -328,6 +330,7 @@ declare module "stackgl" {
         faces(attr: any, opts?: any): Geometry;
         bind(shader: any): void;
         draw(triangles: any): void;
+        unbind(): void;
 
         constructor(context: Context);
     }
@@ -343,7 +346,9 @@ declare module "stackgl" {
     export class Shader {        
         vertShader: WebGLShader;
         fragShader: WebGLShader;
-        program: WebGLProgram;        
+        program: WebGLProgram;
+
+        bind(): void;      
     }
 }
 
