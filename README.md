@@ -33,7 +33,9 @@ Conclusion: Try stack.gl. it's small and modular, shader-oriented.
 
 - add stack gl canvas-loop
 
-Debugging: Try http://google.github.io/tracing-framework/analyzing-traces.html
+Debugging:
+- Try http://google.github.io/tracing-framework/analyzing-traces.html
+- https://hacks.mozilla.org/2013/11/live-editing-webgl-shaders-with-firefox-developer-tools/
 
 ####Entry 2 - Prepping the codebase
 
@@ -86,6 +88,7 @@ Remeber, deferred shading is possible with WebGL 1.0, but you would have to writ
 - http://learnopengl.com/#!Advanced-Lighting/Deferred-Shading
 - http://www.slideshare.net/guerrillagames/deferred-rendering-in-killzone-2-9691589
 - https://github.com/tiansijie/DeferredShader
+- http://math.hws.edu/graphicsbook/c7/s4.html render to texture guide
 
 ####Entry 5 - Modelling
 - Get the wacom out. https://www.youtube.com/watch?v=OFBmg-N41gs
