@@ -281,7 +281,7 @@ export class Renderer {
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.vbo_indices);
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);        
         
-        this.display_type = DisplayType.Depth;        
+        this.display_type = DisplayType.Total;        
     }
 
     public render(drawUnits: DrawUnit[]): void {
@@ -350,9 +350,9 @@ export class Renderer {
             , far
         )
 
-        //mat4.multiply(view, model, mv);        
-        //mat4.invert(invTrans, mv);
-        //mat4.transpose(invTrans, invTrans);        
+        mat4.multiply(mv, view, model);        
+        mat4.invert(invTrans, mv);
+        mat4.transpose(invTrans, invTrans);        
 
         function drawMesh() {
 
@@ -386,73 +386,13 @@ export class Renderer {
 
                 // Binds the geometry and sets up the shader's attribute
                 // locations accordingly.
-                //drawUnit.geometry.bind(drawUnit.shader)
-                       
-                //this.pass_prog.uniforms.u_Texutre = 
-
-                drawUnit.geometry.bind(this.pass_prog);                  
-
-                /*var positions = new Float32Array([
-                    -1.0, 1.0, 0.0,
-                    -1.0, -1.0, 0.0,
-                    1.0, -1.0, 0.0,
-                    1.0, 1.0, 0.0
-                ]);
-
-                var indices = [0, 1, 2, 0, 2, 3];
-
-                var thing :Geometry = new Geometry(this.gl);
-
-                thing.attr('Position', positions);
-                thing.attr('Normal', positions);
-                thing.attr('Texcoord', positions);
-
-                thing.faces(indices);            
-
-                thing.bind(this.pass_prog);                
-
-                this.pass_prog.uniforms.u_Model = model;
-                this.pass_prog.uniforms.u_View = view;
-                this.pass_prog.uniforms.u_Persp = projection;
-                this.pass_prog.uniforms.u_InvTrans = invTrans;         
-                thing.draw(this.gl.TRIANGLES);
-                thing.unbind();*/
+                drawUnit.geometry.bind(this.pass_prog);       
 
                 this.pass_prog.uniforms.u_Model = model;
                 this.pass_prog.uniforms.u_View = view;
                 this.pass_prog.uniforms.u_Persp = projection;
                 this.pass_prog.uniforms.u_InvTrans = invTrans;
 
-                
-                //this.positionLocation = this.gl.getAttribLocation(this.pass_prog.program, "Position");
-                //this.normalLocation = this.gl.getAttribLocation(this.pass_prog.program, "Normal");
-                //this.texCoordLocation = this.gl.getAttribLocation(this.pass_prog.program, "Texcoord");
-
-                //var u_textureLocation: WebGLUniformLocation = this.gl.getUniformLocation(this.pass_prog.program, "u_Texutre");
-
-                //this.u_ModelLocation = this.gl.getUniformLocation(this.pass_prog.program, "u_Model");
-                //this.u_ViewLocation = this.gl.getUniformLocation(this.pass_prog.program, "u_View");
-                //this.u_PerspLocation = this.gl.getUniformLocation(this.pass_prog.program, "u_Persp");
-                //this.u_InvTransLocation = this.gl.getUniformLocation(this.pass_prog.program, "u_InvTrans");
-                //this.u_ColorSamplerLocation = this.gl.getUniformLocation(this.pass_prog.program, "u_ColorSampler");
-
-                //function setMatrixUniforms(model)
-                //{
-                  //  this.gl.uniformMatrix4fv(this.u_ModelLocation, false, model);
-                    //this.gl.uniformMatrix4fv(this.u_ViewLocation, false, view);
-                    //this.gl.uniformMatrix4fv(this.u_PerspLocation, false, projection);
-                    //this.gl.uniformMatrix4fv(this.u_InvTransLocation, false, invTrans);
-                //}
-
-                // Updates our model/view/projection matrices, sending them
-                // to the GPU as uniform variables that we can use in
-                // `shaders/bunny.vert` and `shaders/bunny.frag`.
-                //drawUnit.shader.uniforms.uProjection = projection;
-                //drawUnit.shader.uniforms.uView = view;
-                //drawUnit.shader.uniforms.uModel = model;
-
-                // No draw, just clear to blue
-                //this.gl.clearColor(0, 0, 1, 1);
                 drawUnit.geometry.draw(this.gl.TRIANGLES);
 
                 drawUnit.geometry.unbind();
@@ -495,27 +435,19 @@ export class Renderer {
 
         //First Pass
         //----------        
-                
-        //debugDraw.bind(this)();
         drawMesh.bind(this)();
 
         //Second Pass
         //-----------
-
-        //this.gl.enable(this.gl.BLEND);
-        //this.gl.disable(this.gl.DEPTH_TEST);
-        //this.gl.blendFunc(this.gl.ONE, this.gl.ONE);
-        //this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-
-        this.gl.viewport(0, 0, width, height);  // Viewport is not set automatically!
-
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-
-
+        
         // should not be able to see any red.
         this.gl.clearColor(1, 0, 0, 1);
 
-           //this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+        //this.gl.enable(this.gl.BLEND);
+        this.gl.disable(this.gl.DEPTH_TEST);
+        //this.gl.blendFunc(this.gl.ONE, this.gl.ONE);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        this.gl.viewport(0, 0, width, height);  // Viewport is not set automatically!s
 
         this.diagnostic_prog.bind();
 
