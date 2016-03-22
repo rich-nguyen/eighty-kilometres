@@ -41,7 +41,7 @@ void main(void)
     float diffuse = abs(dot(normal, normalize(light - position)));
     max(dot(normal, normalize(light - position)),0.0);
     if(u_DisplayType == DISPLAY_DEPTH)
-        gl_FragColor = vec4(vec3(lin_depth) * 30.0, 1.0);        
+        gl_FragColor = vec4(vec3(lin_depth), 1.0);        
     else if(u_DisplayType == DISPLAY_NORMAL)
         gl_FragColor = vec4(abs(normal), 1.0);
     else if(u_DisplayType == DISPLAY_POSITION)

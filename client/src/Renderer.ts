@@ -281,7 +281,7 @@ export class Renderer {
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.vbo_indices);
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);        
         
-        this.display_type = DisplayType.Total;        
+        this.display_type = DisplayType.Depth;        
     }
 
     public render(drawUnits: DrawUnit[]): void {
@@ -439,7 +439,7 @@ export class Renderer {
 
         //Second Pass
         //-----------
-        
+
         // should not be able to see any red.
         this.gl.clearColor(1, 0, 0, 1);
 
@@ -479,7 +479,7 @@ export class Renderer {
 
         // make texture unit 0 active.
         this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.depthTexture);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.depthRGBTexture);
         this.gl.uniform1i(this.diagnosticLocs[5], 0);
 
         this.gl.activeTexture(this.gl.TEXTURE1);

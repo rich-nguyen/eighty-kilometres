@@ -28,7 +28,7 @@ void main(void) {
 
     gl_Position = u_Persp * u_View * u_Model * vec4(Position, 1.0);
 
-    fs_Depth = 0.5; //((gl_Position.z / gl_Position.w));
+    fs_Depth = (gl_Position.z / gl_Position.w);
     
     //gl_Position = vec4(Position,1.0);
 }
