@@ -61,9 +61,9 @@ export class Renderer {
 
     private display_type: DisplayType;
 
-    private normalTexture: WebGLTexture;
-    private colorTexture: WebGLTexture;
-    private positionTexture: WebGLTexture;
+    private normalTexture: Texture2D;
+    private colorTexture: Texture2D;
+    private positionTexture: Texture2D;
     private depthRGBTexture: Texture2D;
     private depthTexture: Texture2D;  
 
@@ -114,39 +114,25 @@ export class Renderer {
         this.gl.getExtension("OES_texture_float");
         this.gl.getExtension("OES_half_float_linear");
         this.gl.getExtension("OES_texture_float_linear");
-
-        this.normalTexture = this.gl.createTexture();
-        this.colorTexture = this.gl.createTexture();
-        this.positionTexture = this.gl.createTexture();
         
         // Defaults to magFilter/minFilter = NEAREST, wrap = CLAMP_TO_EDGE.
-        this.depthRGBTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);
         this.depthTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.DEPTH_COMPONENT, this.gl.UNSIGNED_SHORT);
+
+        this.depthRGBTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);        
         this.depthRGBTexture.magFilter = this.gl.LINEAR;
         this.depthRGBTexture.minFilter = this.gl.LINEAR;
 
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.normalTexture);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
+        this.normalTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);
+        this.normalTexture.magFilter = this.gl.LINEAR;
+        this.normalTexture.minFilter = this.gl.LINEAR;
 
+        this.positionTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);
+        this.positionTexture.magFilter = this.gl.LINEAR;
+        this.positionTexture.minFilter = this.gl.LINEAR;
 
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.positionTexture);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
-
-
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.colorTexture);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
+        this.colorTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);
+        this.colorTexture.magFilter = this.gl.LINEAR;
+        this.colorTexture.minFilter = this.gl.LINEAR;
 
         // Create and bind framebuffer object.
         this.frameBuffer = this.gl.createFramebuffer();
@@ -163,9 +149,9 @@ export class Renderer {
         ]);
 
         // Setup deferred shading by attaching textures to different frame buffer color attachments.
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT0_WEBGL, this.gl.TEXTURE_2D, this.normalTexture, 0);
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT1_WEBGL, this.gl.TEXTURE_2D, this.colorTexture, 0);
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT2_WEBGL, this.gl.TEXTURE_2D, this.positionTexture, 0);
+        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT0_WEBGL, this.gl.TEXTURE_2D, this.normalTexture.handle, 0);
+        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT1_WEBGL, this.gl.TEXTURE_2D, this.colorTexture.handle, 0);
+        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT2_WEBGL, this.gl.TEXTURE_2D, this.positionTexture.handle, 0);
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT3_WEBGL, this.gl.TEXTURE_2D, this.depthRGBTexture.handle, 0);
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.TEXTURE_2D, this.depthTexture.handle, 0);
         
@@ -428,16 +414,13 @@ export class Renderer {
         this.depthRGBTexture.bind(0);
         this.gl.uniform1i(this.diagnosticLocs[5], 0);
 
-        this.gl.activeTexture(this.gl.TEXTURE1);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.normalTexture);
+        this.normalTexture.bind(1);
         this.gl.uniform1i(this.diagnosticLocs[6], 1);
 
-        this.gl.activeTexture(this.gl.TEXTURE2);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.positionTexture);
+        this.positionTexture.bind(2);
         this.gl.uniform1i(this.diagnosticLocs[7], 2);
 
-        this.gl.activeTexture(this.gl.TEXTURE3);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.colorTexture);
+        this.colorTexture.bind(3);
         this.gl.uniform1i(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Colortex"), 3);
 
         var lightPos = vec3.create();
@@ -463,6 +446,8 @@ export class Renderer {
         this.gl.disableVertexAttribArray(this.quad_texCoordLocation);
 
         this.gl.disable(this.gl.BLEND);
+
+        pip([this.depthRGBTexture, this.colorTexture, this.normalTexture, this.positionTexture]);
         
     }
     
