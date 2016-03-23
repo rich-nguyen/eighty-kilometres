@@ -12,7 +12,7 @@ uniform sampler2D u_Depthtex;
 uniform sampler2D u_Normaltex;
 uniform sampler2D u_Positiontex;
 uniform sampler2D u_Colortex; 
-uniform sampler2D u_Debugtex;
+
 uniform int u_DisplayType;
 uniform float u_Far;
 uniform float u_Near;
@@ -34,7 +34,7 @@ void main(void)
     vec3 normal = normalize(texture2D(u_Normaltex, fs_Texcoord).xyz);
     vec3 position = texture2D(u_Positiontex, fs_Texcoord).xyz;
     vec3 color = texture2D(u_Colortex, fs_Texcoord).xyz;
-    vec3 debug = texture2D(u_Debugtex,fs_Texcoord).xyz;
+    
     
     vec3 light = u_Light.xyz;//.position.xyz;
     //u_Light.xyz;

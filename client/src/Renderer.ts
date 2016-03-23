@@ -4,7 +4,7 @@
 /// <reference path="ambient/typings/main.d.ts" />
 /// <reference path="ambient/stackgl.d.ts" />
 
-import { Context, Matrix, Shader } from 'stackgl'
+import { Context, Matrix, Shader, Texture2D } from 'stackgl'
 import { Application } from './app'
 import createContext = require('gl-context')
 import * as mat4 from 'gl-mat4'
@@ -18,6 +18,7 @@ import LookAtCamera = require('lookat-camera')
 import orbitCamera = require('canvas-orbit-camera')
 
 import Geometry = require('gl-geometry')
+import createTexture = require('gl-texture2d')
 
 var pip = require('gl-texture2d-pip')
 
@@ -42,7 +43,6 @@ export class Renderer {
     
     private pass_prog: Shader;
     private diagnostic_prog: Shader;
-    private debug_prog: Shader;
 
     private diagnosticLocs: WebGLUniformLocation[];
     private diagnosticLoc_Light: WebGLUniformLocation;
@@ -64,10 +64,8 @@ export class Renderer {
     private normalTexture: WebGLTexture;
     private colorTexture: WebGLTexture;
     private positionTexture: WebGLTexture;
-    private depthRGBTexture: WebGLTexture;
-    private depthTexture: WebGLTexture;
-
-    private debugTexture: WebGLTexture;
+    private depthRGBTexture: Texture2D;
+    private depthTexture: Texture2D;  
 
     private lookAtCamera: LookAtCamera;
     private orbitCamera: any;
@@ -77,12 +75,9 @@ export class Renderer {
     private vbo_indices: any;
     private vbo_textures: any;
 
-    private ready: any;
-
     private ext: any;
 
     constructor() {
-        this.ready = false;
 
         // Creates a canvas element and attaches
         // it to the <body> on your DOM.hello richard, i loveyou x
@@ -123,15 +118,12 @@ export class Renderer {
         this.normalTexture = this.gl.createTexture();
         this.colorTexture = this.gl.createTexture();
         this.positionTexture = this.gl.createTexture();
-        this.depthRGBTexture = this.gl.createTexture();
-        this.depthTexture = this.gl.createTexture();
-
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.depthTexture);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.DEPTH_COMPONENT, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 0, this.gl.DEPTH_COMPONENT, this.gl.UNSIGNED_SHORT, null);
+        
+        // Defaults to magFilter/minFilter = NEAREST, wrap = CLAMP_TO_EDGE.
+        this.depthRGBTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);
+        this.depthTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.DEPTH_COMPONENT, this.gl.UNSIGNED_SHORT);
+        this.depthRGBTexture.magFilter = this.gl.LINEAR;
+        this.depthRGBTexture.minFilter = this.gl.LINEAR;
 
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.normalTexture);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
@@ -156,14 +148,6 @@ export class Renderer {
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
         this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
 
-
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.depthRGBTexture);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
-
         // Create and bind framebuffer object.
         this.frameBuffer = this.gl.createFramebuffer();
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);      
@@ -179,14 +163,11 @@ export class Renderer {
         ]);
 
         // Setup deferred shading by attaching textures to different frame buffer color attachments.
-
-        //this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.colorTexture, 0);
-
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT0_WEBGL, this.gl.TEXTURE_2D, this.normalTexture, 0);
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT1_WEBGL, this.gl.TEXTURE_2D, this.colorTexture, 0);
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT2_WEBGL, this.gl.TEXTURE_2D, this.positionTexture, 0);
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT3_WEBGL, this.gl.TEXTURE_2D, this.depthRGBTexture, 0);
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.TEXTURE_2D, this.depthTexture, 0);
+        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT3_WEBGL, this.gl.TEXTURE_2D, this.depthRGBTexture.handle, 0);
+        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.TEXTURE_2D, this.depthTexture.handle, 0);
         
 
         if (this.gl.checkFramebufferStatus(this.gl.FRAMEBUFFER) !== this.gl.FRAMEBUFFER_COMPLETE) {
@@ -197,39 +178,11 @@ export class Renderer {
             console.log("Frame buffer initialisation success");
         }
 
-        var cubeImage = new Image();
-        var me = this;
-
-        function handleTextureLoaded():void {
-            console.log("handleTextureLoaded");
-            me.gl.bindTexture(me.gl.TEXTURE_2D, me.debugTexture);
-            me.gl.texImage2D(me.gl.TEXTURE_2D, 0, me.gl.RGBA, me.gl.RGBA, me.gl.UNSIGNED_BYTE, cubeImage);
-
-            me.gl.texParameteri(me.gl.TEXTURE_2D, me.gl.TEXTURE_MAG_FILTER, me.gl.LINEAR);
-            me.gl.texParameteri(me.gl.TEXTURE_2D, me.gl.TEXTURE_MIN_FILTER, me.gl.LINEAR);
-            me.gl.texParameteri(me.gl.TEXTURE_2D, me.gl.TEXTURE_WRAP_S, me.gl.CLAMP_TO_EDGE);
-            me.gl.texParameteri(me.gl.TEXTURE_2D, me.gl.TEXTURE_WRAP_T, me.gl.CLAMP_TO_EDGE);
-            
-            //me.gl.texParameteri(me.gl.TEXTURE_2D, me.gl.TEXTURE_MAG_FILTER, me.gl.LINEAR);
-            //me.gl.texParameteri(me.gl.TEXTURE_2D, me.gl.TEXTURE_MIN_FILTER, me.gl.LINEAR_MIPMAP_NEAREST);
-            //me.gl.generateMipmap(me.gl.TEXTURE_2D);
-            me.gl.bindTexture(me.gl.TEXTURE_2D, null);
-
-            me.ready = true;
-        }
-
-        //Texture debugging:
-        this.debugTexture = this.gl.createTexture();
-        
-        cubeImage.onload = handleTextureLoaded;
-        cubeImage.src = 'http://localhost:9000/client/assets/built-assets/cubetexture.png';
-
         //programs:
         // 1. pass_prog
         // 2. one of: ambient_prog | light_prog | nontilelight_prog | diagnostic_prog
 
         // Interpreted.
-
         this.pass_prog = glShader(this.gl,
             glslify('./shaders/deferred/first-pass.vert'),
             glslify('./shaders/deferred/first-pass.frag')
@@ -239,11 +192,6 @@ export class Renderer {
         this.diagnostic_prog = glShader(this.gl,
             glslify('./shaders/deferred/second-pass.vert'),
             glslify('./shaders/deferred/second-pass-debug.frag')
-        );
-
-        this.debug_prog = glShader(this.gl,
-            glslify('./shaders/basic.vert')
-            , glslify('./shaders/basic.frag')
         );
 
         this.diagnosticLocs = [];
@@ -284,10 +232,7 @@ export class Renderer {
         this.display_type = DisplayType.Depth;        
     }
 
-    public render(drawUnits: DrawUnit[]): void {
-        if (!this.ready){
-            return;
-        }
+    public render(drawUnits: DrawUnit[]): void {        
 
         // Create the base matrices to be used
         // when rendering the bunny. Alternatively, can
@@ -343,6 +288,7 @@ export class Renderer {
         // Result: 600 // 
         var far = 600.0;
 
+        // Use helper function to construct projection matrix to convert camera viewspace to clipspace.
         mat4.perspective(projection
             , fieldOfView
             , aspectRatio
@@ -350,6 +296,7 @@ export class Renderer {
             , far
         )
 
+        // Pre-calculate the inverse view model transform.
         mat4.multiply(mv, view, model);        
         mat4.invert(invTrans, mv);
         mat4.transpose(invTrans, invTrans);        
@@ -477,9 +424,8 @@ export class Renderer {
         this.gl.uniform1f(this.diagnosticLocs[3], this.gl.drawingBufferWidth);
         this.gl.uniform1f(this.diagnosticLocs[4], this.gl.drawingBufferHeight);
 
-        // make texture unit 0 active.
-        this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.depthRGBTexture);
+        // Bind depth texture to unit 0.        
+        this.depthRGBTexture.bind(0);
         this.gl.uniform1i(this.diagnosticLocs[5], 0);
 
         this.gl.activeTexture(this.gl.TEXTURE1);
@@ -493,10 +439,6 @@ export class Renderer {
         this.gl.activeTexture(this.gl.TEXTURE3);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.colorTexture);
         this.gl.uniform1i(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Colortex"), 3);
-
-        this.gl.activeTexture(this.gl.TEXTURE4);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.debugTexture);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Debugtex"), 4);
 
         var lightPos = vec3.create();
         vec3.set(lightPos, 0.0, 10.0, 0.0);

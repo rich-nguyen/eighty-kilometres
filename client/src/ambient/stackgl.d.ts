@@ -350,6 +350,18 @@ declare module "stackgl" {
 
         bind(): void;      
     }
+
+    export class Texture2D {
+
+        handle: WebGLTexture;
+        bind(texunit: number);
+
+        shape: number[];
+        wrap: number[];
+        magFilter: number;
+        minFilter: number;
+        mipSamples: number;
+    }
 }
 
 declare module "gl-context" {
@@ -389,4 +401,12 @@ declare module "glslify" {
 
     function transform(filename: string, browserifyOpts?: any): any;
     export = transform;
+}
+
+declare module "gl-texture2d" {
+
+    import {Context, Texture2D} from 'stackgl'
+
+    function createTexture2d(context: Context, width: number, height: number, format?: number, type?: number): Texture2D;
+    export = createTexture2d;
 }
