@@ -12,7 +12,7 @@ gulp.task('default', function() {
   });
 
   return build
-    .plugin(tsify, { noImplicitAny: true })
+    .plugin(tsify, { noImplicitAny: true, target: 'ES5'})
     .bundle()
     .pipe(source('app.js'))
     .pipe(gulp.dest('./target/'));
