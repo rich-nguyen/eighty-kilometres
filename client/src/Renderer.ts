@@ -1,5 +1,7 @@
 // The renderer. Draws objects contained in scenes.
-// Deferred rendering system based on https://github.com/YuqinShao/Tile_Based_WebGL_DeferredShader
+// Deferred rendering system based on:
+// https://hacks.mozilla.org/2014/01/webgl-deferred-shading
+// https://github.com/YuqinShao/Tile_Based_WebGL_DeferredShader
 
 /// <reference path="ambient/typings/main.d.ts" />
 /// <reference path="ambient/stackgl.d.ts" />
