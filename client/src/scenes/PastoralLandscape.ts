@@ -52,7 +52,17 @@ export class PastoralLandscape implements Scene {
                     this.teapot = parseObj(<string>response.responseText);
                     this.teapotGeometry = new Geometry(context);
                     this.teapotGeometry.attr('Position', this.teapot.positions);
-                    this.teapotGeometry.attr('Normal', this.teapot.vertexNormals);
+
+                    let norms : any = [];
+                    for (let faceNormal of this.teapot.faceNormals) {
+                        let normal: any = [];
+                        normal[0] = this.teapot.vertexNormals[faceNormal[0]];
+                        normal[1] = this.teapot.vertexNormals[faceNormal[1]];
+                        normal[2] = this.teapot.vertexNormals[faceNormal[2]];
+                        norms.push(normal);
+                    }
+
+                    this.teapotGeometry.attr('Normal', norms);
                     this.teapotGeometry.attr('Texcoord', this.teapot.vertexUVs);                    
                     this.teapotGeometry.faces(this.teapot.cells);
                 });
