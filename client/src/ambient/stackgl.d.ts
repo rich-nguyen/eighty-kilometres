@@ -354,7 +354,7 @@ declare module "stackgl" {
     export class Texture2D {
 
         handle: WebGLTexture;
-        bind(texunit: number);
+        bind(texunit: number): void;
 
         shape: number[];
         wrap: number[];
