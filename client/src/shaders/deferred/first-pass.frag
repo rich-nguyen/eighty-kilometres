@@ -16,11 +16,16 @@ varying float fs_Depth;
 
 void main(void)
 {
-    //normal, color, position, depth
-    
+    //normal, color, position, depth    
     gl_FragData[0] = vec4(normalize(fs_Normal.xyz), 1.0);
+
+    //color
     gl_FragData[1] = vec4(0.5, 0.5, 0.5, 1.0);    //vec4(texture2D(u_Texutre, fs_Texcoord).xyz, 1.0);
-    gl_FragData[2] = fs_Position;
+
+    //position
+    gl_FragData[2] = vec4(fs_Position.xyz, 1.0);
+
+    //depth    
     gl_FragData[3] = vec4(vec3(fs_Depth), 1.0);
    
     //gl_FragData[1] = vec4(u_Color.x, u_Color.y, u_Color.z, 1.0);    

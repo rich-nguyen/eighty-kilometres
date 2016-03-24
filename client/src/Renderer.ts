@@ -217,7 +217,7 @@ export class Renderer {
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.vbo_indices);
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);        
         
-        this.display_type = DisplayType.Depth;        
+        this.display_type = DisplayType.Position;        
     }
 
     public render(drawUnits: DrawUnit[]): void {        
@@ -327,6 +327,8 @@ export class Renderer {
                 this.pass_prog.uniforms.u_View = view;
                 this.pass_prog.uniforms.u_Persp = projection;
                 this.pass_prog.uniforms.u_InvTrans = invTrans;
+                this.pass_prog.uniforms.u_Near = near;
+                this.pass_prog.uniforms.u_Far = far;
 
                 drawUnit.geometry.draw(this.gl.TRIANGLES);
 
@@ -390,9 +392,7 @@ export class Renderer {
         this.gl.bindAttribLocation(this.diagnostic_prog.program, this.quad_texCoordLocation, "Texcoord");
 
         this.diagnosticLocs = [];
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_DisplayType"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Near"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Far"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_DisplayType"));        
         this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Width"));
         this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Height"));
         this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Depthtex"));
@@ -405,28 +405,27 @@ export class Renderer {
         // Typescript Enum!!
         this.gl.uniform1i(this.diagnosticLocs[0], this.display_type);
 
-        this.gl.uniform1f(this.diagnosticLocs[1], near);
-        this.gl.uniform1f(this.diagnosticLocs[2], far);
 
-
-        this.gl.uniform1f(this.diagnosticLocs[3], this.gl.drawingBufferWidth);
-        this.gl.uniform1f(this.diagnosticLocs[4], this.gl.drawingBufferHeight);
+        this.gl.uniform1f(this.diagnosticLocs[1], this.gl.drawingBufferWidth);
+        this.gl.uniform1f(this.diagnosticLocs[2], this.gl.drawingBufferHeight);
 
         // Bind depth texture to unit 0.        
         this.depthRGBTexture.bind(0);
-        this.gl.uniform1i(this.diagnosticLocs[5], 0);
+        this.gl.uniform1i(this.diagnosticLocs[3], 0);
 
         this.normalTexture.bind(1);
-        this.gl.uniform1i(this.diagnosticLocs[6], 1);
+        this.gl.uniform1i(this.diagnosticLocs[4], 1);
 
         this.positionTexture.bind(2);
-        this.gl.uniform1i(this.diagnosticLocs[7], 2);
+        this.gl.uniform1i(this.diagnosticLocs[5], 2);
 
         this.colorTexture.bind(3);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Colortex"), 3);
+        this.gl.uniform1i(this.diagnosticLocs[6], 3);
 
         var lightPos = vec3.create();
-        vec3.set(lightPos, 0.0, 10.0, 0.0);
+        // from MEL: xform - q - t - ws pointLight1;
+        // Result: -340.990599 112.828416 -25.446585
+        vec3.set(lightPos, -340.990599, 112.828416, - 25.446585);
         var lightdest = vec3.create();
         vec3.transformMat4(view, lightPos, lightdest);        
 
