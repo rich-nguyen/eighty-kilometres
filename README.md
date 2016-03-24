@@ -5,7 +5,7 @@
 - Build prod: gulp
 - Build dev : beefy src/app.ts:app.js 8000 -- -p [ tsify ]
 3. typescript - npm install -g typescript@1.7.5 typings@0.6.6
-- typings install, in src folder
+- typings install, in src/ambient folder
 
 ###Log Book
 
