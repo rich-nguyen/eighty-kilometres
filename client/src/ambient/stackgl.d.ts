@@ -410,3 +410,9 @@ declare module "gl-texture2d" {
     function createTexture2d(context: Context, width: number, height: number, format?: number, type?: number): Texture2D;
     export = createTexture2d;
 }
+
+declare module "unindex-mesh" {
+
+    function unindex(positions: any, cells: any, out?: any): any;
+    export = unindex;
+}
