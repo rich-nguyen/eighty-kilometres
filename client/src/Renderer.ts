@@ -349,7 +349,7 @@ export class Renderer {
 
             // Enables face culling, which prevents triangles
             // being visible from behind.
-            //this.gl.enable(this.gl.CULL_FACE)
+            this.gl.enable(this.gl.CULL_FACE)
 
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
 
