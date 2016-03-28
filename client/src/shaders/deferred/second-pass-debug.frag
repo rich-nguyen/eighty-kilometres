@@ -34,7 +34,7 @@ void main(void)
     if(u_DisplayType == DISPLAY_DEPTH)
         gl_FragColor = vec4(depth, 1.0);        
     else if(u_DisplayType == DISPLAY_NORMAL)
-        gl_FragColor = vec4(abs(normal), 1.0);
+        gl_FragColor = vec4(normal, 1.0);
     else if(u_DisplayType == DISPLAY_POSITION)
         gl_FragColor = vec4(abs(position / 500.0), 1.0); // u_far estimate of 500.0
     else if(u_DisplayType == DISPLAY_COLOR){
