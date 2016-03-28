@@ -11,6 +11,8 @@ import glShader = require('gl-shader')
 import glslify = require('glslify')
 import parseObj = require('parse-wavefront-obj')
 import qwest = require('qwest')
+import _ = require('lodash')
+import unindex = require('unindex-mesh')
 
 export class PastoralLandscape implements Scene {
     
@@ -50,22 +52,40 @@ export class PastoralLandscape implements Scene {
             qwest.get('http://localhost:9000/client/assets/built-assets/floorplan.obj')
                 .then((response: any) => {
                     this.teapot = parseObj(<string>response.responseText);
+
+                    /* responseText is a wavefront obj file, which will be parsed into a JS object:
+                        - positions - an array of vec3 points.
+                        - vertexNormals - an array of vec3 normals.
+                        - vertexUVs - an array of vec2 UV co-ordinates.
+                        - cells - a 2D index array referencing values from 'positions'.
+                            The first dimension is the cell, and the second is the vertex of the triangle.
+                        - faceNormals - an index array referencing values from 'vertexNormals'.
+                            The first dimension is the cell/face, and the second is the vertex of the triangle.
+                        - faceUVs - an index array referencing values from 'vertexUVs'.
+                            The first dimension is the cell/face, and the second is the vertex of the triangle.
+                    */
+
                     this.teapotGeometry = new Geometry(context);
-                    this.teapotGeometry.attr('Position', this.teapot.positions);
 
-                    let norms : any = [];
-                    for (let faceNormal of this.teapot.faceNormals) {
-                        let normal: any = [];
-                        normal[0] = this.teapot.vertexNormals[faceNormal[0]];
-                        normal[1] = this.teapot.vertexNormals[faceNormal[1]];
-                        normal[2] = this.teapot.vertexNormals[faceNormal[2]];
-                        norms.push(normal);
-                    }
+                    /* Dependening on the geometry, we render in one of two ways:
+                        - Use an array of index references to draw cells, calling through to drawElements.
+                            - vertex information is normalised, and one vertex is shared by each adjacent cell.
+                            - smaller arrays, quicker draw.
+                        - Use an array of values to draw  cells, calling through to drawArrays.
+                            - vertex information is per-face, so each instance of the vertex has it's own normal/uv. Good for angled/unsmooth geometry. 
+                            - slower draw, unindexing is needed.
+                    */
 
-                    this.teapotGeometry.attr('Normal', norms);
-                    this.teapotGeometry.attr('Texcoord', this.teapot.vertexUVs);                    
-                    this.teapotGeometry.faces(this.teapot.cells);
-                });
+                    // Use chunk for debugging. The Geometry class does understand flat arrays, but these are hard for me to read/debug.
+                    const unindexedPositions: any = _.chunk(unindex(this.teapot.positions, this.teapot.cells), 3);
+                    const unindexedNormals: any = _.chunk(unindex(this.teapot.vertexNormals, this.teapot.faceNormals), 3);
+                    const unindexedUVs: any = _.chunk(unindex(this.teapot.vertexUVs, this.teapot.faceUVs), 3);
+
+                    this.teapotGeometry.attr('Position', unindexedPositions);
+                    this.teapotGeometry.attr('Normal', unindexedNormals);
+                    this.teapotGeometry.attr('Texcoord', unindexedUVs);
+                }
+            );
         }
 
         // 2. construct shader. Needs:
