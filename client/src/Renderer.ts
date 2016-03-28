@@ -217,7 +217,7 @@ export class Renderer {
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.vbo_indices);
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);        
         
-        this.display_type = DisplayType.Normal;        
+        this.display_type = DisplayType.Total;
     }
 
     public render(drawUnits: DrawUnit[]): void {        
@@ -427,7 +427,7 @@ export class Renderer {
         // Result: -340.990599 112.828416 -25.446585
         vec3.set(lightPos, -340.990599, 112.828416, - 25.446585);
         var lightdest = vec3.create();
-        vec3.transformMat4(view, lightPos, lightdest);        
+        vec3.transformMat4(lightdest, lightPos, view);
 
         this.gl.uniform3fv(this.diagnosticLoc_Light, lightdest); 
 
