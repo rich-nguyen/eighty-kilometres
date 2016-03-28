@@ -22,6 +22,7 @@
     "gl-vec3": "^1.0.3",
     "glslify": "^2.2.1",
     "gulp": "^3.9.0",
+    "lodash": "^3.10.1",
     "lookat-camera": "^1.0.0",
     "normals": "^0.1.0",
     "parse-wavefront-obj": "^1.0.1",
