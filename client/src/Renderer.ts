@@ -217,7 +217,7 @@ export class Renderer {
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.vbo_indices);
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);        
         
-        this.display_type = DisplayType.Position;        
+        this.display_type = DisplayType.Normal;        
     }
 
     public render(drawUnits: DrawUnit[]): void {        
@@ -448,7 +448,8 @@ export class Renderer {
 
         this.gl.disable(this.gl.BLEND);
 
-        pip([this.depthRGBTexture, this.colorTexture, this.normalTexture, this.positionTexture]);
+        // Debug draw the geometry buffers. Don't render positionTexture because it hasn't been normalised by the camera's far clip.
+        pip([this.depthRGBTexture, this.colorTexture, this.normalTexture]);
         
     }
     
