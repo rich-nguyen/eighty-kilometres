@@ -1,4 +1,17 @@
 
+declare module "gl-vec3" {
+
+    import { Matrix } from "stackgl"
+
+    export function create(init?: any): any;
+
+    export function set(vec: any, x: number, y: number, z: number): void;
+
+    //transformMat4(out:vec3, a:vec3, m:mat4)
+    export function transformMat4(out: any, a: any, m: Matrix): any;
+
+}
+
 declare module "gl-mat4" {
 
     import { Matrix } from "stackgl"
@@ -310,22 +323,14 @@ declare module "stackgl" {
         faceUVs?: Index4[];
     }
 
-    export class Context {
-        drawingBufferWidth: number;
-        drawingBufferHeight: number;
-        viewport(top: number, left: number, right: number, bottom: number): void;
-        enable(setting: any): void;
-
-        DEPTH_TEST: any;
-        CULL_FACE: any;
-        TRIANGLES: any;
-    }
+    export type Context = WebGLRenderingContext;    
 
     export class Geometry {
         attr(name: any, attr: any, opts?: any): Geometry;
         faces(attr: any, opts?: any): Geometry;
         bind(shader: any): void;
         draw(triangles: any): void;
+        unbind(): void;
 
         constructor(context: Context);
     }
@@ -336,6 +341,26 @@ declare module "stackgl" {
         up: number[];
 
         view(view: any): any;
+    }
+
+    export class Shader {        
+        vertShader: WebGLShader;
+        fragShader: WebGLShader;
+        program: WebGLProgram;
+
+        bind(): void;      
+    }
+
+    export class Texture2D {
+
+        handle: WebGLTexture;
+        bind(texunit: number): void;
+
+        shape: number[];
+        wrap: number[];
+        magFilter: number;
+        minFilter: number;
+        mipSamples: number;
     }
 }
 
@@ -365,9 +390,9 @@ declare module "parse-wavefront-obj" {
 
 declare module "gl-shader" {
 
-    import {Context} from 'stackgl'
+    import {Context, Shader} from 'stackgl'
 
-    function createShader(context: Context, vertexShader: any, fragmentShader: any): any;
+    function createShader(context: Context, vertexShader: WebGLShader, fragmentShader: WebGLShader): Shader;
 
     export = createShader;
 }
@@ -376,4 +401,18 @@ declare module "glslify" {
 
     function transform(filename: string, browserifyOpts?: any): any;
     export = transform;
+}
+
+declare module "gl-texture2d" {
+
+    import {Context, Texture2D} from 'stackgl'
+
+    function createTexture2d(context: Context, width: number, height: number, format?: number, type?: number): Texture2D;
+    export = createTexture2d;
+}
+
+declare module "unindex-mesh" {
+
+    function unindex(positions: any, cells: any, out?: any): any;
+    export = unindex;
 }

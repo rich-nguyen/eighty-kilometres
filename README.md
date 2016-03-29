@@ -1,11 +1,11 @@
 ###Tools used
 
 1. aws-cli - brew install awscli
-2. beefy - npm install -g beefy@2.1.5 browserify@12.0.0 gulp-cli@1.2.0
+2. beefy - npm install -g beefy@2.1.6 browserify@12.0.0 gulp-cli@1.2.0
 - Build prod: gulp
 - Build dev : beefy src/app.ts:app.js 8000 -- -p [ tsify ]
 3. typescript - npm install -g typescript@1.7.5 typings@0.6.6
-- typings install, in src folder
+- typings install, in src/ambient folder
 
 ###Log Book
 
@@ -31,7 +31,11 @@ Model formatting is another thing to skip around. Try asset import?
 
 Conclusion: Try stack.gl. it's small and modular, shader-oriented.
 
-add canvas-loop
+- add stack gl canvas-loop
+
+Debugging:
+- Try http://google.github.io/tracing-framework/analyzing-traces.html
+- https://hacks.mozilla.org/2013/11/live-editing-webgl-shaders-with-firefox-developer-tools/
 
 ####Entry 2 - Prepping the codebase
 
@@ -59,6 +63,10 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 - Deferred shading, G Buffers. Tiled shader is more performant.
 - Bloom.
 - Web worker.
+- DevicePixelRatio = 0.7 render, then use css as upscaler. https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices
+
+####Sexy features
+- Light propagation volumes. http://www.lionhead.com/blog/2014/april/17/dynamic-global-illumination-in-fable-legends/
 
 #####Deferred Passes
 - direct illumination.
@@ -77,10 +85,13 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 - https://unity3d.com/learn/tutorials/modules/beginner/graphics/lighting-and-rendering
 
 #####Reading list: Deferred shading
+Remeber, deferred shading is possible with WebGL 1.0, but you would have to write a single texture (eg. color & depth, then normals) per pass.
 - https://hacks.mozilla.org/2014/01/webgl-deferred-shading/
 - http://codeflow.org/entries/2012/aug/25/webgl-deferred-irradiance-volumes/
 - http://learnopengl.com/#!Advanced-Lighting/Deferred-Shading
 - http://www.slideshare.net/guerrillagames/deferred-rendering-in-killzone-2-9691589
+- https://github.com/tiansijie/DeferredShader
+- http://math.hws.edu/graphicsbook/c7/s4.html render to texture guide
 
 ####Entry 5 - Modelling
 - Get the wacom out. https://www.youtube.com/watch?v=OFBmg-N41gs

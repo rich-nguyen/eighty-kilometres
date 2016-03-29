@@ -11,6 +11,8 @@ import glShader = require('gl-shader')
 import glslify = require('glslify')
 import parseObj = require('parse-wavefront-obj')
 import qwest = require('qwest')
+import _ = require('lodash')
+import unindex = require('unindex-mesh')
 
 export class PastoralLandscape implements Scene {
     
@@ -50,11 +52,40 @@ export class PastoralLandscape implements Scene {
             qwest.get('http://localhost:9000/client/assets/built-assets/floorplan.obj')
                 .then((response: any) => {
                     this.teapot = parseObj(<string>response.responseText);
+
+                    /* responseText is a wavefront obj file, which will be parsed into a JS object:
+                        - positions - an array of vec3 points.
+                        - vertexNormals - an array of vec3 normals.
+                        - vertexUVs - an array of vec2 UV co-ordinates.
+                        - cells - a 2D index array referencing values from 'positions'.
+                            The first dimension is the cell, and the second is the vertex of the triangle.
+                        - faceNormals - an index array referencing values from 'vertexNormals'.
+                            The first dimension is the cell/face, and the second is the vertex of the triangle.
+                        - faceUVs - an index array referencing values from 'vertexUVs'.
+                            The first dimension is the cell/face, and the second is the vertex of the triangle.
+                    */
+
                     this.teapotGeometry = new Geometry(context);
-                    this.teapotGeometry.attr('aPosition', this.teapot.positions);
-                    this.teapotGeometry.faces(this.teapot.cells);
-                    console.log(this.teapot);
-                });
+
+                    /* Dependening on the geometry, we render in one of two ways:
+                        - Use an array of index references to draw cells, calling through to drawElements.
+                            - vertex information is normalised, and one vertex is shared by each adjacent cell.
+                            - smaller arrays, quicker draw.
+                        - Use an array of values to draw  cells, calling through to drawArrays.
+                            - vertex information is per-face, so each instance of the vertex has it's own normal/uv. Good for angled/unsmooth geometry. 
+                            - slower draw, unindexing is needed.
+                    */
+
+                    // Use chunk for debugging. The Geometry class does understand flat arrays, but these are hard for me to read/debug.
+                    const unindexedPositions: any = _.chunk(unindex(this.teapot.positions, this.teapot.cells), 3);
+                    const unindexedNormals: any = _.chunk(unindex(this.teapot.vertexNormals, this.teapot.faceNormals), 3);
+                    const unindexedUVs: any = _.chunk(unindex(this.teapot.vertexUVs, this.teapot.faceUVs), 3);
+
+                    this.teapotGeometry.attr('Position', unindexedPositions);
+                    this.teapotGeometry.attr('Normal', unindexedNormals);
+                    this.teapotGeometry.attr('Texcoord', unindexedUVs);
+                }
+            );
         }
 
         // 2. construct shader. Needs:
@@ -70,11 +101,11 @@ export class PastoralLandscape implements Scene {
         // This Grass quad is inlined. for easy drawing.
         if (!this.grassGeometry) {
             this.grassGeometry = new Geometry(context)
-            this.grassGeometry.attr('aPosition', this.grassPositions);
+            this.grassGeometry.attr('Position', this.grassPositions);
             this.grassGeometry.faces(this.grassCells);
         }
 
-        if (!this.shader) {
+        /*if (!this.shader) {
             // Pulls up our shader code and returns an instance
             // of gl-shader. Using the glslify browserify transform,
             // these will be passed through glslify first to pull in
@@ -87,7 +118,7 @@ export class PastoralLandscape implements Scene {
                 glslify('../shaders/basic.vert')
                 , glslify('../shaders/basic.frag')
             );
-        }
+        }*/
     }
 
     public getDrawUnits(): DrawUnit[] {
@@ -102,7 +133,7 @@ export class PastoralLandscape implements Scene {
         if (this.teapotGeometry) {
             drawUnits[0] = {
                 geometry: this.teapotGeometry,
-                shader: this.shader
+                shader: null
             };
         }
         return drawUnits;
