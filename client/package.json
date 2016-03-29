@@ -28,6 +28,7 @@
     "parse-wavefront-obj": "^1.0.1",
     "qwest": "^4.1.1",
     "tsify": "^0.13.2",
+    "unindex-mesh": "^2.0.0",
     "vinyl-source-stream": "^1.1.0"
   },
   "scripts": {
