@@ -40,9 +40,9 @@ export enum DisplayType {
 export class Renderer {
 
     public gl: Context;
-    private canvas: Node;
+    private canvas: HTMLCanvasElement;
     private frameBuffer: WebGLFramebuffer;
-    
+
     private pass_prog: Shader;
     private diagnostic_prog: Shader;
 
@@ -79,11 +79,15 @@ export class Renderer {
 
     private ext: any;
 
+    private canvasClientWidth: number;
+    private canvasClientHeight: number;
+
     constructor() {
 
         // Creates a canvas element and attaches
         // it to the <body> on your DOM.hello richard, i loveyou x
-        this.canvas = document.body.appendChild(document.createElement('canvas'));
+        this.canvas = document.createElement("canvas");
+        document.body.appendChild(this.canvas);
 
         // Creates an instance of look-at camera and orbit camera.
         this.lookAtCamera = new LookAtCamera();
@@ -108,10 +112,22 @@ export class Renderer {
 
         // Resizes the <canvas> to fully fit the window
         // whenever the window is resized.
-        window.addEventListener('resize'
-            , fit(this.canvas)
-            , false
-        )
+        window.addEventListener('resize', () => {
+            this.canvasClientWidth = this.canvas.clientWidth;
+            this.canvasClientHeight = this.canvas.clientHeight;
+
+            //http://stackoverflow.com/questions/4938346/canvas-width-and-height-in-html5
+            //gl.clearRect
+        });
+
+        this.canvasClientWidth = this.canvas.clientWidth;
+        this.canvasClientHeight = this.canvas.clientHeight;
+        // Now set the canvas to be upscaled.
+        this.canvas.height = this.canvasClientHeight / 2;
+        this.canvas.width = this.canvasClientWidth / 2;
+
+        // TODO: Some styling will be needed to maintain aspect ratio.
+
 
         this.gl.getExtension("OES_texture_float");
         this.gl.getExtension("OES_half_float_linear");
