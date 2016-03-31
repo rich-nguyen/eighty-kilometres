@@ -355,6 +355,7 @@ declare module "stackgl" {
 
         handle: WebGLTexture;
         bind(texunit: number): void;
+        dispose(): void;
 
         shape: number[];
         wrap: number[];
