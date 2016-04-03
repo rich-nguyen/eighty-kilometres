@@ -56,7 +56,7 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 
 #####Must have features
 - global illumination. Radiosity, photon mapping. Radiosity replaces ambient and diffuse terms in standard lighting.
-- BRDF surface shader. Oren-Nayar, Cook-Torrance.
+- BRDF surface shader. Oren-Nayar(BRDF diffuse), Cook-Torrance (BRDF specular).
 - shadows. Variance shadow maps.
 - Anti aliasing.
 - Sky box. gl-skybox
@@ -68,17 +68,16 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 ####Sexy features
 - Light propagation volumes. http://www.lionhead.com/blog/2014/april/17/dynamic-global-illumination-in-fable-legends/
 
-#####Deferred Passes
-- direct illumination.
-- global illumination. Baked, not Pre-computed.
-- shadow pass.
-- depth pass.
+#####Shading model
+- direct illumination (diffuse, specular).
+- global illumination (ambient). Baked, not Pre-computed.
 
 #####Reading list: BRDF
 - https://renderman.pixar.com/view/cook-torrance-shader
-- http://simonstechblog.blogspot.co.uk/2011/12/microfacet-brdf.html
+- http://simonstechblog.blogspot.co.uk/2011/12/microfacet-brdf.html (with energy conservation functions for specular and diffuse)
 - http://graphicrants.blogspot.co.uk/2013/08/specular-brdf-reference.html
 - http://dontnormalize.me/tag/cook-torrance/
+- https://sdm.scad.edu/faculty/mkesson/vsfx755/wip/best/spring2012/kevin_george/final/index.html
 
 #####Reading list: General
 - http://www.valvesoftware.com/publications/2006/SIGGRAPH06_Course_ShadingInValvesSourceEngine.pdf
