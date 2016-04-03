@@ -40,9 +40,9 @@ export enum DisplayType {
 export class Renderer {
 
     public gl: Context;
-    private canvas: Node;
+    private canvas: HTMLCanvasElement;
     private frameBuffer: WebGLFramebuffer;
-    
+
     private pass_prog: Shader;
     private diagnostic_prog: Shader;
 
@@ -79,11 +79,14 @@ export class Renderer {
 
     private ext: any;
 
+    private canvasClientWidth: number;
+    private canvasClientHeight: number;
+
     constructor() {
 
         // Creates a canvas element and attaches
         // it to the <body> on your DOM.hello richard, i loveyou x
-        this.canvas = document.body.appendChild(document.createElement('canvas'));
+        this.canvas = <HTMLCanvasElement>document.querySelector(".primary-canvas");
 
         // Creates an instance of look-at camera and orbit camera.
         this.lookAtCamera = new LookAtCamera();
@@ -108,36 +111,40 @@ export class Renderer {
 
         // Resizes the <canvas> to fully fit the window
         // whenever the window is resized.
-        window.addEventListener('resize'
-            , fit(this.canvas)
-            , false
-        )
+        window.addEventListener('resize', () => {
+            if (this.canvasClientHeight !== this.canvas.clientHeight &&
+                this.canvasClientWidth !== this.canvas.clientWidth ) {
+
+                this.canvasClientWidth = this.canvas.clientWidth;
+                this.canvasClientHeight = this.canvas.clientHeight;
+            
+                this.canvas.height = this.canvasClientHeight;
+                this.canvas.width = this.canvasClientWidth;
+
+                this.setupFrameBufferTextures();
+
+                //http://stackoverflow.com/questions/4938346/canvas-width-and-height-in-html5
+                //gl.clearRect
+            }
+        });
+
+        this.canvasClientWidth = this.canvas.clientWidth;
+        this.canvasClientHeight = this.canvas.clientHeight;
+        // Now set the canvas to be upscaled.
+        this.canvas.height = this.canvasClientHeight;
+        this.canvas.width = this.canvasClientWidth;
+
+        // TODO: Some styling will be needed to maintain aspect ratio.
+
 
         this.gl.getExtension("OES_texture_float");
         this.gl.getExtension("OES_half_float_linear");
         this.gl.getExtension("OES_texture_float_linear");
         
-        // Defaults to magFilter/minFilter = NEAREST, wrap = CLAMP_TO_EDGE.
-        this.depthTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.DEPTH_COMPONENT, this.gl.UNSIGNED_SHORT);
-
-        this.depthRGBTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);        
-        this.depthRGBTexture.magFilter = this.gl.LINEAR;
-        this.depthRGBTexture.minFilter = this.gl.LINEAR;
-
-        this.normalTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);
-        this.normalTexture.magFilter = this.gl.LINEAR;
-        this.normalTexture.minFilter = this.gl.LINEAR;
-
-        this.positionTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);
-        this.positionTexture.magFilter = this.gl.LINEAR;
-        this.positionTexture.minFilter = this.gl.LINEAR;
-
-        this.colorTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);
-        this.colorTexture.magFilter = this.gl.LINEAR;
-        this.colorTexture.minFilter = this.gl.LINEAR;
+        
 
         // Create and bind framebuffer object.
-        this.frameBuffer = this.gl.createFramebuffer();
+        this.frameBuffer = this.gl.createFramebuffer();       
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);      
 
 
@@ -150,21 +157,7 @@ export class Renderer {
             this.ext.COLOR_ATTACHMENT3_WEBGL  // gl_FragData[3] Depth
         ]);
 
-        // Setup deferred shading by attaching textures to different frame buffer color attachments.
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT0_WEBGL, this.gl.TEXTURE_2D, this.normalTexture.handle, 0);
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT1_WEBGL, this.gl.TEXTURE_2D, this.colorTexture.handle, 0);
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT2_WEBGL, this.gl.TEXTURE_2D, this.positionTexture.handle, 0);
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT3_WEBGL, this.gl.TEXTURE_2D, this.depthRGBTexture.handle, 0);
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.TEXTURE_2D, this.depthTexture.handle, 0);
-        
-
-        if (this.gl.checkFramebufferStatus(this.gl.FRAMEBUFFER) !== this.gl.FRAMEBUFFER_COMPLETE) {
-            // Can't use framebuffer.
-            // See http://www.khronos.org/opengles/sdk/docs/man/xhtml/glCheckFramebufferStatus.xml
-            console.log("Frame buffer initialisation failed");
-        } else {
-            console.log("Frame buffer initialisation success");
-        }
+        this.setupFrameBufferTextures();
 
         //programs:
         // 1. pass_prog
@@ -218,6 +211,61 @@ export class Renderer {
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);        
         
         this.display_type = DisplayType.Total;
+    }
+
+    private setupFrameBufferTextures(): void {
+
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
+
+        // Defaults to magFilter/minFilter = NEAREST, wrap = CLAMP_TO_EDGE.
+        if (this.depthTexture) {
+            this.depthTexture.dispose();
+        }
+        this.depthTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.DEPTH_COMPONENT, this.gl.UNSIGNED_SHORT);
+
+        if (this.depthRGBTexture) {
+            this.depthRGBTexture.dispose();
+        }
+        this.depthRGBTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);
+        this.depthRGBTexture.magFilter = this.gl.LINEAR;
+        this.depthRGBTexture.minFilter = this.gl.LINEAR;
+
+        if (this.normalTexture) {
+            this.normalTexture.dispose();
+        }
+        this.normalTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);
+        this.normalTexture.magFilter = this.gl.LINEAR;
+        this.normalTexture.minFilter = this.gl.LINEAR;
+
+        if (this.positionTexture) {
+            this.positionTexture.dispose();
+        }
+        this.positionTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);
+        this.positionTexture.magFilter = this.gl.LINEAR;
+        this.positionTexture.minFilter = this.gl.LINEAR;
+
+        if (this.colorTexture) {
+            this.colorTexture.dispose();
+        }
+        this.colorTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);
+        this.colorTexture.magFilter = this.gl.LINEAR;
+        this.colorTexture.minFilter = this.gl.LINEAR;
+
+        // Setup deferred shading by attaching textures to different frame buffer color attachments.
+        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT0_WEBGL, this.gl.TEXTURE_2D, this.normalTexture.handle, 0);
+        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT1_WEBGL, this.gl.TEXTURE_2D, this.colorTexture.handle, 0);
+        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT2_WEBGL, this.gl.TEXTURE_2D, this.positionTexture.handle, 0);
+        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT3_WEBGL, this.gl.TEXTURE_2D, this.depthRGBTexture.handle, 0);
+        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.TEXTURE_2D, this.depthTexture.handle, 0);
+        
+
+        if (this.gl.checkFramebufferStatus(this.gl.FRAMEBUFFER) !== this.gl.FRAMEBUFFER_COMPLETE) {
+            // Can't use framebuffer.
+            // See http://www.khronos.org/opengles/sdk/docs/man/xhtml/glCheckFramebufferStatus.xml
+            console.log("Frame buffer initialisation failed");
+        } else {
+            console.log("Frame buffer initialisation success");
+        }
     }
 
     public render(drawUnits: DrawUnit[]): void {        
