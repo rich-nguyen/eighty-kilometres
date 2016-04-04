@@ -65,8 +65,10 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 - Web worker.
 - DevicePixelRatio = 0.7 render, then use css as upscaler. https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices
 
-####Sexy features
+#### Global illumination, real time options
 - Light propagation volumes. http://www.lionhead.com/blog/2014/april/17/dynamic-global-illumination-in-fable-legends/
+- More LPV: http://www.crytek.com/download/Light_Propagation_Volumes.pdf
+- Deferred irradiance volumes. http://codeflow.org/entries/2012/aug/25/webgl-deferred-irradiance-volumes
 
 #####Shading model
 - direct illumination (diffuse, specular).
