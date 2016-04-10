@@ -55,13 +55,13 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 ####Entry 4 - Shading wishlist
 
 #####Must have features
-- global illumination. Radiosity, photon mapping. Radiosity replaces ambient and diffuse terms in standard lighting.
+- global illumination. Radiosity, photon mapping. A baked radiosity solution replaces the ambient and diffuse terms in standard lighting, but doesn't model dynamic lights; too slow for that, of course.
 - BRDF surface shader. Oren-Nayar(BRDF diffuse), Cook-Torrance (BRDF specular).
 - shadows. Variance shadow maps.
 - Anti aliasing.
 - Sky box. gl-skybox
 - Deferred shading, G Buffers. Tiled shader is more performant.
-- Bloom.
+- Bloom and HDR.
 - Web worker.
 - DevicePixelRatio = 0.7 render, then use css as upscaler. https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices
 
@@ -69,10 +69,20 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 - Light propagation volumes. http://www.lionhead.com/blog/2014/april/17/dynamic-global-illumination-in-fable-legends/
 - More LPV: http://www.crytek.com/download/Light_Propagation_Volumes.pdf
 - Deferred irradiance volumes. http://codeflow.org/entries/2012/aug/25/webgl-deferred-irradiance-volumes
+- Directional irradiance volumes, like Source. http://www.cs.utah.edu/~shirley/papers/irradiance.pdf
 
 #####Shading model
 - direct illumination (diffuse, specular).
-- global illumination (ambient). Baked, not Pre-computed.
+- global illumination (ambient). Baked could be made with a radiosity solver. Pre-computed could be possible with a light probes implementation.
+
+####Entry 5 - Real time lighting: what will the composite image be made from?
+- Easy one first: the direct illumination from local light emitters.
+    - Includes albedo, which will be a single color for a surface, stylistically.
+- If the object is static, we could add an ambient diffuse term using a baked global illumination lightmap, calculated from a radiosity solver. Eg. for the world model. Also accouts for albedo, from the static model.
+- If the object is dynamic, we want to use this lighting pipeline for the ambient diffuse term:
+    - Pre-compute light probes (whenever the local lights dictate an update is needed). Takes a scene rendered from local-light and baked GI, and samples the light values from various directions to create an irradiance volume (we'll call it the light probe).
+    - At render time, take the nearest light probe to the model, and use the averaged directional irradiance light to find an approximate GI ambient term for the dynamic model.
+- Finally, don't forget specular, for dynamic objects. Assuming static objects have static or zero specular, for now. 
 
 #####Reading list: BRDF
 - https://renderman.pixar.com/view/cook-torrance-shader
@@ -83,12 +93,12 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 
 #####Reading list: General
 - http://www.valvesoftware.com/publications/2006/SIGGRAPH06_Course_ShadingInValvesSourceEngine.pdf
+- http://www2.ati.com/developer/gdc/D3DTutorial10_Half-Life2_Shading.pdf
 - https://unity3d.com/learn/tutorials/modules/beginner/graphics/lighting-and-rendering
 
 #####Reading list: Deferred shading
 Remeber, deferred shading is possible with WebGL 1.0, but you would have to write a single texture (eg. color & depth, then normals) per pass.
 - https://hacks.mozilla.org/2014/01/webgl-deferred-shading/
-- http://codeflow.org/entries/2012/aug/25/webgl-deferred-irradiance-volumes/
 - http://learnopengl.com/#!Advanced-Lighting/Deferred-Shading
 - http://www.slideshare.net/guerrillagames/deferred-rendering-in-killzone-2-9691589
 - https://github.com/tiansijie/DeferredShader
