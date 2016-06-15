@@ -76,12 +76,13 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 - global illumination (ambient). Baked could be made with a radiosity solver. Pre-computed could be possible with a light probes implementation.
 
 ####Entry 5 - Real time lighting: what will the composite image be made from?
-- Easy one first: the direct illumination from local light emitters.
+- Easy one first: the direct illumination from local light emitters. Take the two nearest local lights.
     - Includes albedo, which will be a single color for a surface, stylistically.
 - If the object is static, we could add an ambient diffuse term using a baked global illumination lightmap, calculated from a radiosity solver. Eg. for the world model. Also accouts for albedo, from the static model.
 - If the object is dynamic, we want to use this lighting pipeline for the ambient diffuse term:
     - Pre-compute light probes (whenever the local lights dictate an update is needed). Takes a scene rendered from local-light and baked GI, and samples the light values from various directions to create an irradiance volume (we'll call it the light probe).
     - At render time, take the nearest light probe to the model, and use the averaged directional irradiance light to find an approximate GI ambient term for the dynamic model.
+- This makes `diffuseLighting = OrenNayarlightOneTerm + OrenNayarlightTwoTerm + GIAmbientTerm * albedo` 
 - Finally, don't forget specular, for dynamic objects. Assuming static objects have static or zero specular, for now. 
 
 #####Reading list: BRDF
