@@ -28,6 +28,8 @@ target
 typings
 .target
 /*/bin/
+built-assets
+renderData
 
 RUNNING_PID
 
