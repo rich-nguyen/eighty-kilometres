@@ -109,3 +109,23 @@ Remeber, deferred shading is possible with WebGL 1.0, but you would have to writ
 - Get the wacom out. https://www.youtube.com/watch?v=OFBmg-N41gs
 - First MEL command in a while: worldspace translation for transform: xform -q -t -ws "sceneCamera1aim" 
 
+####Entry 6 - Simple scene lighting
+The simplest way I can think of shading a scene, without it looking like a fixed-function pipeline, is to cheat. That is, account for ambient lighting statically, and sum any contribution from nearby dynamic lights on top of that. Benefits:
+    - Even having two lambert lights, say half lambert diffuse, looks better than one.
+    - The ambient light contribution is higher when we use half lambert, and gives a huge visual quality increase compared to a constant ambient light value.
+
+Steps needed:
+- create lightmaps in Maya. Open the scene which will be the background of the scene.
+    - Make sure there is a light in the scene.
+    - Make sure there is a uv set created. Use Automatic Mapping to start with!
+    - In Maya, go to Lighting/Shading, Batch Bake (mental ray). You must have mental ray installed to do this. In the options, make sure we are baking to texture, not vertices, and hit convert. Maya will create a `.tif` file in the directory `<project-folder>\renderData\mentalray\lightMap`. Tips:
+        - Tick "keep original shading network" in the batch bake options to reduce the chance of destroying shade graph with a file node.
+        - Select the object you want to export!
+        - Use option "bake set override" if you want to play with settings ad-hoc.
+        - we may want a separate occlusion map too, one day.
+- Update the renderer so that it can take a single texture with a set of UVs.
+- Add two dynamic lights to the scene using standard lambert shading that has been used so far.
+
+####Maya Gotchas
+- completely lost shading on a mesh: it was the Mesh Component Display, Display Colors was ticked. Untick it, or toggle it with Color->Toggle Display Colors Attribute.
+
