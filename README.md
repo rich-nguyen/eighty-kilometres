@@ -107,7 +107,8 @@ Remeber, deferred shading is possible with WebGL 1.0, but you would have to writ
 
 ####Entry 5 - Modelling
 - Get the wacom out. https://www.youtube.com/watch?v=OFBmg-N41gs
-- First MEL command in a while: worldspace translation for transform: xform -q -t -ws "sceneCamera1aim" 
+- First MEL command in a while: worldspace translation for transform: xform -q -t -ws "sceneCamera1aim"
+- Export system: just plain old Maya File->Export Selection. Choose OBJExport as the format, and pop it into the server's `conf/built-assets` folder.  
 
 ####Entry 6 - Simple scene lighting
 The simplest way I can think of shading a scene, without it looking like a fixed-function pipeline, is to cheat. That is, account for ambient lighting statically, and sum any contribution from nearby dynamic lights on top of that. Benefits:
@@ -123,6 +124,7 @@ Steps needed:
         - Select the object you want to export!
         - Use option "bake set override" if you want to play with settings ad-hoc.
         - we may want a separate occlusion map too, one day.
+    - Copy the output light map into the server's `conf/built-assets` folder.
 - Update the renderer so that it can take a single texture with a set of UVs.
 - Add two dynamic lights to the scene using standard lambert shading that has been used so far.
 
