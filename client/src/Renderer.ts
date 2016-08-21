@@ -26,6 +26,7 @@ var pip = require('gl-texture2d-pip')
 
 export interface DrawUnit {
     geometry: any
+    texture: Texture2D
     shader: Shader
 }
 
@@ -377,6 +378,7 @@ export class Renderer {
                 this.pass_prog.uniforms.u_InvTrans = invTrans;
                 this.pass_prog.uniforms.u_Near = near;
                 this.pass_prog.uniforms.u_Far = far;
+                this.pass_prog.uniforms.u_Texture = drawUnit.texture.bind(0);
 
                 drawUnit.geometry.draw(this.gl.TRIANGLES);
 
