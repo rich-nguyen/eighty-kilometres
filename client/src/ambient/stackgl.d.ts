@@ -409,6 +409,10 @@ declare module "gl-texture2d" {
     import {Context, Texture2D} from 'stackgl'
 
     function createTexture2d(context: Context, width: number, height: number, format?: number, type?: number): Texture2D;
+    
+    // data could be a HTMLImageElement, HTMLCanvasElement, HTMLVideoElement.
+    function createTexture2d(context: Context, data: any): Texture2D;
+
     export = createTexture2d;
 }
 
