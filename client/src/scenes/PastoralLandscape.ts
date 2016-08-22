@@ -52,7 +52,7 @@ export class PastoralLandscape implements Scene {
         // Use chunk for debugging. The Geometry class does understand flat arrays, but these are hard for me to read/debug.
         const unindexedPositions: any = _.chunk(unindex(floorplanObj.positions, floorplanObj.cells), 3);
         const unindexedNormals: any = _.chunk(unindex(floorplanObj.vertexNormals, floorplanObj.faceNormals), 3);
-        const unindexedUVs: any = _.chunk(unindex(floorplanObj.vertexUVs, floorplanObj.faceUVs), 3);
+        const unindexedUVs: any = _.chunk(unindex(floorplanObj.vertexUVs, floorplanObj.faceUVs), 2);
 
         this.floorplanGeometry.attr('Position', unindexedPositions);
         this.floorplanGeometry.attr('Normal', unindexedNormals);
