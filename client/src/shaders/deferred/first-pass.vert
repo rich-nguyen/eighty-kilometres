@@ -16,7 +16,7 @@ attribute vec2 Texcoord;
 
 varying vec3 fs_Normal;
 varying vec4 fs_Position;
-//varying vec2 fs_Texcoord;
+varying vec2 fs_Texcoord;
 varying float fs_Depth;
 
 float linearizeDepth(float exp_depth, float near, float far) {
@@ -29,7 +29,7 @@ void main(void) {
     
     gl_Position = u_Persp * camera;
 
-    //fs_Texcoord = Texcoord;
+    fs_Texcoord = Texcoord;
     fs_Position = camera;
 
     fs_Depth = linearizeDepth(gl_Position.z / gl_Position.w, u_Near, u_Far);     

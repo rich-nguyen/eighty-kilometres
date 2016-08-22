@@ -56,7 +56,7 @@ export class PastoralLandscape implements Scene {
 
         this.floorplanGeometry.attr('Position', unindexedPositions);
         this.floorplanGeometry.attr('Normal', unindexedNormals);
-        this.floorplanGeometry.attr('Texcoord', unindexedUVs);
+        this.floorplanGeometry.attr('Texcoord', unindexedUVs, {size: 2});
     }
 
     public load(context: Context): void {
