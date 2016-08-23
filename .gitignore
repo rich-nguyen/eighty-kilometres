@@ -6,6 +6,7 @@
 *.iml
 *.box
 *.log
+.mayaSwatches
 
 *.mtl
 *.swatches
