@@ -1,6 +1,6 @@
 //Maya ASCII 2015 scene
 //Name: floorplan.ma
-//Last modified: Sun, Aug 21, 2016 08:42:14 PM
+//Last modified: Tue, Aug 23, 2016 09:00:42 AM
 //Codeset: UTF-8
 requires maya "2015";
 requires -nodeType "mentalrayFramebuffer" -nodeType "mentalrayOptions" -nodeType "mentalrayGlobals"
@@ -12,14 +12,14 @@ fileInfo "version" "2015";
 fileInfo "cutIdentifier" "201503261530-955654";
 fileInfo "osv" "Mac OS X 10.9.2";
 createNode transform -s -n "persp";
-	setAttr ".t" -type "double3" -43.073495862188622 1059.6918839022155 -228.22494756484838 ;
-	setAttr ".r" -type "double3" -429.93835262442013 4068.6186715482413 0 ;
+	setAttr ".t" -type "double3" 53.775070106046513 898.63932454623705 -228.29310851594931 ;
+	setAttr ".r" -type "double3" -410.7383526241681 4070.2186715449752 0 ;
 	setAttr ".rp" -type "double3" -1.1368683772161603e-13 -5.6843418860808015e-14 0 ;
 	setAttr ".rpt" -type "double3" 2.6436275411490171e-13 3.1749624330155435e-12 -3.5306118367779195e-13 ;
 createNode camera -s -n "perspShape" -p "persp";
 	setAttr -k off ".v";
 	setAttr ".fl" 34.999999999999979;
-	setAttr ".coi" 984.42261608282274;
+	setAttr ".coi" 784.46156833564419;
 	setAttr ".imn" -type "string" "persp";
 	setAttr ".den" -type "string" "persp_depth";
 	setAttr ".man" -type "string" "persp_mask";
@@ -3083,7 +3083,7 @@ createNode transform -n "sceneCamera1up" -p "sceneCamera1group";
 createNode locator -n "sceneCamera1upShape" -p "sceneCamera1up";
 	setAttr -k off ".v" no;
 createNode transform -n "pointLight1";
-	setAttr ".t" -type "double3" -489.66680727799832 127.6895932201557 -189.00853008706432 ;
+	setAttr ".t" -type "double3" -518.17191948546258 179.00392341248892 -242.51706775648736 ;
 createNode pointLight -n "pointLightShape1" -p "pointLight1";
 	setAttr -k off ".v";
 	setAttr ".in" 2;
@@ -3357,6 +3357,9 @@ createNode polyAutoProj -n "polyAutoProj1";
 	setAttr ".s" -type "double3" 509.30145263671875 509.30145263671875 509.30145263671875 ;
 	setAttr ".ps" 0.20000000298023224;
 	setAttr ".dl" yes;
+createNode file -n "file1";
+	setAttr ".ftn" -type "string" "/Users/noin/work/eighty-kilometres/server/conf/built-assets/floorplan.jpg";
+createNode place2dTexture -n "place2dTexture1";
 select -ne :time1;
 	setAttr ".o" 1;
 	setAttr ".unw" 1;
@@ -3367,12 +3370,16 @@ select -ne :defaultShaderList1;
 	setAttr -s 2 ".s";
 select -ne :postProcessList1;
 	setAttr -s 2 ".p";
+select -ne :defaultRenderUtilityList1;
 select -ne :defaultRenderingList1;
 select -ne :lightList1;
+select -ne :defaultTextureList1;
+select -ne :lambert1;
 select -ne :initialShadingGroup;
 	setAttr ".ro" yes;
 select -ne :initialParticleSE;
 	setAttr ".ro" yes;
+select -ne :initialMaterialInfo;
 select -ne :defaultResolution;
 	setAttr ".pa" 1;
 select -ne :defaultLightSet;
@@ -3423,11 +3430,33 @@ connectAttr "polySurfaceShape1.o" "polyPlanarProj1.ip";
 connectAttr "LivingRoomShape.wm" "polyPlanarProj1.mp";
 connectAttr "polyPlanarProj1.out" "polyAutoProj1.ip";
 connectAttr "LivingRoomShape.wm" "polyAutoProj1.mp";
+connectAttr "place2dTexture1.c" "file1.c";
+connectAttr "place2dTexture1.tf" "file1.tf";
+connectAttr "place2dTexture1.rf" "file1.rf";
+connectAttr "place2dTexture1.mu" "file1.mu";
+connectAttr "place2dTexture1.mv" "file1.mv";
+connectAttr "place2dTexture1.s" "file1.s";
+connectAttr "place2dTexture1.wu" "file1.wu";
+connectAttr "place2dTexture1.wv" "file1.wv";
+connectAttr "place2dTexture1.re" "file1.re";
+connectAttr "place2dTexture1.of" "file1.of";
+connectAttr "place2dTexture1.r" "file1.ro";
+connectAttr "place2dTexture1.n" "file1.n";
+connectAttr "place2dTexture1.vt1" "file1.vt1";
+connectAttr "place2dTexture1.vt2" "file1.vt2";
+connectAttr "place2dTexture1.vt3" "file1.vt3";
+connectAttr "place2dTexture1.vc1" "file1.vc1";
+connectAttr "place2dTexture1.o" "file1.uv";
+connectAttr "place2dTexture1.ofs" "file1.fs";
+connectAttr "place2dTexture1.msg" ":defaultRenderUtilityList1.u" -na;
 connectAttr "defaultRenderLayer.msg" ":defaultRenderingList1.r" -na;
 connectAttr "pointLightShape1.ltd" ":lightList1.l" -na;
+connectAttr "file1.msg" ":defaultTextureList1.tx" -na;
+connectAttr "file1.oc" ":lambert1.c";
 connectAttr "LivingRoomShape.iog" ":initialShadingGroup.dsm" -na;
+connectAttr "file1.msg" ":initialMaterialInfo.t" -na;
 connectAttr "pointLight1.iog" ":defaultLightSet.dsm" -na;
 dataStructure -fmt "raw" -as "name=externalContentTable:string=node:string=key:string=upath:uint32=upathcrc:string=rpath:string=roles";
-applyMetadata -fmt "raw" -v "channel\nname externalContentTable\nstream\nname v1.0\nindexType numeric\nstructure externalContentTable\n0\n\"|imagePlane1|imagePlaneShape1\" \"imageName\" \"/Users/noin/work/eighty-kilometres/assets/floorplan.png\" 3037419248 \"/Users/noin/work/eighty-kilometres/assets/floorplan.png\" \"sourceImages\"\n1\n\"|pointLight1|pointLightShape1\" \"dmapName\" \"depthmap\" 2097411553 \"\" \"sourceImages\"\nendStream\nendChannel\nendAssociations\n" 
+applyMetadata -fmt "raw" -v "channel\nname externalContentTable\nstream\nname v1.0\nindexType numeric\nstructure externalContentTable\n0\n\"|imagePlane1|imagePlaneShape1\" \"imageName\" \"/Users/noin/work/eighty-kilometres/assets/floorplan.png\" 3037419248 \"/Users/noin/work/eighty-kilometres/assets/floorplan.png\" \"sourceImages\"\n1\n\"|pointLight1|pointLightShape1\" \"dmapName\" \"depthmap\" 2097411553 \"\" \"sourceImages\"\n2\n\"file1\" \"fileTextureName\" \"/Users/noin/work/eighty-kilometres/server/conf/built-assets/floorplan.jpg\" 3106380890 \"/Users/noin/work/eighty-kilometres/server/conf/built-assets/floorplan.jpg\" \"sourceImages\"\nendStream\nendChannel\nendAssociations\n" 
 		-scn;
 // End of floorplan.ma

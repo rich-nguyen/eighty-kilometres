@@ -474,8 +474,8 @@ export class Renderer {
 
         var lightPos = vec3.create();
         // from MEL: xform - q - t - ws pointLight1;
-        // Result: -340.990599 112.828416 -25.446585
-        vec3.set(lightPos, -340.990599, 112.828416, - 25.446585);
+        // Result: -518.171919 179.003923 -242.517068
+        vec3.set(lightPos, -518.171919, 179.003923, -242.517068);
         var lightdest = vec3.create();
         vec3.transformMat4(lightdest, lightPos, view);
 
