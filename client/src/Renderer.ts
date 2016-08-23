@@ -26,6 +26,7 @@ var pip = require('gl-texture2d-pip')
 
 export interface DrawUnit {
     geometry: any
+    texture: Texture2D
     shader: Shader
 }
 
@@ -377,6 +378,7 @@ export class Renderer {
                 this.pass_prog.uniforms.u_InvTrans = invTrans;
                 this.pass_prog.uniforms.u_Near = near;
                 this.pass_prog.uniforms.u_Far = far;
+                this.pass_prog.uniforms.u_Texture = drawUnit.texture.bind(0);
 
                 drawUnit.geometry.draw(this.gl.TRIANGLES);
 
@@ -472,8 +474,8 @@ export class Renderer {
 
         var lightPos = vec3.create();
         // from MEL: xform - q - t - ws pointLight1;
-        // Result: -340.990599 112.828416 -25.446585
-        vec3.set(lightPos, -340.990599, 112.828416, - 25.446585);
+        // Result: -518.171919 179.003923 -242.517068
+        vec3.set(lightPos, -518.171919, 179.003923, -242.517068);
         var lightdest = vec3.create();
         vec3.transformMat4(lightdest, lightPos, view);
 
