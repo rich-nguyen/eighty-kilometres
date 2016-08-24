@@ -128,6 +128,12 @@ Steps needed:
 - Update the renderer so that it can take a single texture with a set of UVs.
 - Add two dynamic lights to the scene using standard lambert shading that has been used so far.
 
+####Entry 6, part 2 - Sky rendering
+Now that the baked texture is rendered with the single dynamic light, we can add more dynamic lights. But before that, let's add the sky! It has such a big impact on the scene.
+- Option 1: skybox rendering. Simple cubemap render. https://github.com/wwwtyro/gl-skybox
+- Option 2: Rayleight and Mie scattering. https://github.com/wwwtyro/glsl-atmosphere
+- Option 3: Another atmospheric shader model, with sun spotlight. http://codeflow.org/entries/2011/apr/13/advanced-webgl-part-2-sky-rendering/
+
 ####Maya Gotchas
 - completely lost shading on a mesh: it was the Mesh Component Display, Display Colors was ticked. Untick it, or toggle it with Color->Toggle Display Colors Attribute.
 
