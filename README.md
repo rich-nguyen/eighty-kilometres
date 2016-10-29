@@ -1,7 +1,7 @@
 ###Tools used
 
 1. aws-cli - brew install awscli
-2. beefy - npm install -g beefy@2.1.6 browserify@12.0.0 gulp-cli@1.2.0
+2. beefy - npm install -g beefy@2.1.8 browserify@13.1.1 gulp-cli@1.2.2
 - Build prod: gulp
 - Build dev : beefy src/app.ts:app.js 8000 -- -p [ tsify ]
 3. typescript - npm install -g typescript@1.7.5 typings@0.6.6
