@@ -30,6 +30,18 @@ export interface DrawUnit {
     shader: Shader
 }
 
+export interface CameraRenderData {
+    projection: Matrix        
+    view: Matrix
+    invTrans: Matrix
+    model: Matrix
+    mv: Matrix
+    near: number
+    far: number,
+    width: number,
+    height: number
+}
+
 export enum DisplayType {
     Depth,
     Normal,
@@ -44,8 +56,8 @@ export class Renderer {
     private canvas: HTMLCanvasElement;
     private frameBuffer: WebGLFramebuffer;
 
-    private pass_prog: Shader;
-    private diagnostic_prog: Shader;
+    private first_pass_prog: Shader;
+    private second_pass_prog: Shader;
 
     private diagnosticLocs: WebGLUniformLocation[];
     private diagnosticLoc_Light: WebGLUniformLocation;
@@ -85,18 +97,15 @@ export class Renderer {
 
     constructor() {
 
-        // Creates a canvas element and attaches
-        // it to the <body> on your DOM.hello richard, i loveyou x
+        // Creates a canvas element and attaches it to the <body> on your DOM.hello richard, i loveyou x
         this.canvas = <HTMLCanvasElement>document.querySelector(".primary-canvas");
 
         // Creates an instance of look-at camera and orbit camera.
         this.lookAtCamera = new LookAtCamera();
         this.orbitCamera = orbitCamera(this.canvas);      
 
-        // A small convenience function for creating
-        // a new WebGL context – the `render` function
-        // supplied here is called every frame to draw
-        // to the screen.
+        // A small convenience function for creating a new WebGL context – the `render` function
+        // supplied here is called every frame to draw to the screen.
         this.gl = createContext(this.canvas, Application.app.update);
 
         this.ext = this.gl.getExtension('WEBGL_draw_buffers');
@@ -110,8 +119,7 @@ export class Renderer {
             console.log("Extension Depth texture is not supported in this browser.");       
         }
 
-        // Resizes the <canvas> to fully fit the window
-        // whenever the window is resized.
+        // Resizes the <canvas> to fully fit the window whenever the window is resized.
         window.addEventListener('resize', () => {
             if (this.canvasClientHeight !== this.canvas.clientHeight &&
                 this.canvasClientWidth !== this.canvas.clientWidth ) {
@@ -125,7 +133,6 @@ export class Renderer {
                 this.setupFrameBufferTextures();
 
                 //http://stackoverflow.com/questions/4938346/canvas-width-and-height-in-html5
-                //gl.clearRect
             }
         });
 
@@ -135,15 +142,10 @@ export class Renderer {
         this.canvas.height = this.canvasClientHeight;
         this.canvas.width = this.canvasClientWidth;
 
-        // TODO: Some styling will be needed to maintain aspect ratio.
-
-
         this.gl.getExtension("OES_texture_float");
         this.gl.getExtension("OES_half_float_linear");
         this.gl.getExtension("OES_texture_float_linear");
         
-        
-
         // Create and bind framebuffer object.
         this.frameBuffer = this.gl.createFramebuffer();       
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);      
@@ -160,18 +162,12 @@ export class Renderer {
 
         this.setupFrameBufferTextures();
 
-        //programs:
-        // 1. pass_prog
-        // 2. one of: ambient_prog | light_prog | nontilelight_prog | diagnostic_prog
-
-        // Interpreted.
-        this.pass_prog = glShader(this.gl,
+        this.first_pass_prog = glShader(this.gl,
             glslify('./shaders/deferred/first-pass.vert'),
             glslify('./shaders/deferred/first-pass.frag')
         );
 
-
-        this.diagnostic_prog = glShader(this.gl,
+        this.second_pass_prog = glShader(this.gl,
             glslify('./shaders/deferred/second-pass.vert'),
             glslify('./shaders/deferred/second-pass-debug.frag')
         );
@@ -261,35 +257,38 @@ export class Renderer {
         
 
         if (this.gl.checkFramebufferStatus(this.gl.FRAMEBUFFER) !== this.gl.FRAMEBUFFER_COMPLETE) {
-            // Can't use framebuffer.
-            // See http://www.khronos.org/opengles/sdk/docs/man/xhtml/glCheckFramebufferStatus.xml
+            // Can't use framebuffer. See http://www.khronos.org/opengles/sdk/docs/man/xhtml/glCheckFramebufferStatus.xml
             console.log("Frame buffer initialisation failed");
         } else {
             console.log("Frame buffer initialisation success");
         }
     }
 
-    public render(drawUnits: DrawUnit[]): void {        
+    public render(drawUnits: DrawUnit[]): void {
+        var cameraData = this.setupDefaultCamera();
+        this.renderFirstPass(drawUnits, cameraData);
+        this.renderSecondPass(cameraData);        
+    }
 
-        // Create the base matrices to be used
-        // when rendering the bunny. Alternatively, can
-        // be created using `new Float32Array(16)`
-        var projection: Matrix = mat4.create();        
-        var view = mat4.create();
-        var invTrans = mat4.create();
+    private setupDefaultCamera(): CameraRenderData {
 
-        var model = mat4.create();
-        //mat4.identity(model);
+        // Create the base matrices to be used when rendering. Alternatively, they can be created using `new Float32Array(16)`.
+        var cameraRenderData: CameraRenderData = {
+            projection: mat4.create(),
+            view: mat4.create(),
+            invTrans: mat4.create(),
+            model: mat4.create(),
+            mv: mat4.create(),
+            near: 0,
+            far: 0,
+            width: this.gl.drawingBufferWidth, // Update the width/height we use to render the final image.
+            height: this.gl.drawingBufferHeight 
+        }                
 
-        var mv = mat4.create();
-        mat4.identity(invTrans);
+        // Sets the viewport, i.e. tells WebGL to draw the scene across the full canvas.
+        this.gl.viewport(0, 0, cameraRenderData.width, cameraRenderData.height);
 
-        var height: any
-        var width: any
-        // Updates the width/height we use to render the
-        // final image.
-        width = this.gl.drawingBufferWidth
-        height = this.gl.drawingBufferHeight
+        mat4.identity(cameraRenderData.invTrans);
 
         // Use the lookat/orbit camera
         
@@ -303,14 +302,10 @@ export class Renderer {
         // from MEL: xform - q - t - ws "sceneCamera1aim";
         // Result: -326.315692 117.583301 -172.69315 
         this.lookAtCamera.target = [-326.315692, 117.583301, -172.69315];
-        this.lookAtCamera.view(view);
-        
-        //    this.orbitCamera.tick();
-        //    this.orbitCamera.view(view);       
+        this.lookAtCamera.view(cameraRenderData.view);  
 
-        // Update our pespective projection matrix. This is the bit that's
-        // responsible for taking 3D coordinates and projecting
-        // them into 2D screen space.        
+        // Update our pespective projection matrix. This is the bit that's responsible for taking 3D coordinates
+        // and projecting them into 2D screen space.        
         var aspectRatio = this.gl.drawingBufferWidth / this.gl.drawingBufferHeight;
 
         // from MEL: getAttr sceneCamera1.focalLength
@@ -319,142 +314,103 @@ export class Renderer {
 
         // from MEL: getAttr sceneCamera1.nearClipPlane;
         // Result: 1 // 
-        var near = 1.0;
+        cameraRenderData.near = 1.0;
         
         // from MEL: getAttr sceneCamera1.farClipPlane;
         // Result: 600 // 
-        var far = 600.0;
+        cameraRenderData.far = 600.0;
 
         // Use helper function to construct projection matrix to convert camera viewspace to clipspace.
-        mat4.perspective(projection
-            , fieldOfView
-            , aspectRatio
-            , near
-            , far
+        mat4.perspective(
+            cameraRenderData.projection,
+            fieldOfView,
+            aspectRatio,
+            cameraRenderData.near,
+            cameraRenderData.far
         )
 
         // Pre-calculate the inverse view model transform.
-        mat4.multiply(mv, view, model);        
-        mat4.invert(invTrans, mv);
-        mat4.transpose(invTrans, invTrans);        
+        mat4.multiply(cameraRenderData.mv, cameraRenderData.view, cameraRenderData.model);        
+        mat4.invert(cameraRenderData.invTrans, cameraRenderData.mv);
+        mat4.transpose(cameraRenderData.invTrans, cameraRenderData.invTrans);
 
-        function drawMesh() {
+        return cameraRenderData;
+    }
 
-            // Sets the viewport, i.e. tells WebGL to draw the
-            // scene across the full canvas.
-            this.gl.viewport(0, 0, width, height);
+    // First Pass render involves rendering each object's mesh into framebuffer textures. 
+    private renderFirstPass(drawUnits: DrawUnit[], cameraData: CameraRenderData): void {
 
-            // Enables depth testing, which prevents triangles
-            // from overlapping.
-            this.gl.enable(this.gl.DEPTH_TEST);
+        // Enables depth testing, which prevents triangles from overlapping (and later we disable blending).
+        this.gl.enable(this.gl.DEPTH_TEST);
 
-            // Enables face culling, which prevents triangles
-            // being visible from behind.
-            this.gl.enable(this.gl.CULL_FACE);           
-            
-            // Unbind Textures.
-            this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+        // Enables face culling, which prevents triangles being visible from behind.
+        this.gl.enable(this.gl.CULL_FACE);           
+        
+        // Unbind Textures.
+        this.gl.bindTexture(this.gl.TEXTURE_2D, null);
 
-            // Bind Frame Buffer object.
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
+        // Bind Frame Buffer object.
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
 
-            this.gl.disable(this.gl.BLEND);
-            this.gl.depthFunc(this.gl.LESS);       
-            this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
-            this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        this.gl.disable(this.gl.BLEND);
+        this.gl.depthFunc(this.gl.LESS);       
+        this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-            this.gl.clearColor(0, 1, 0, 1); //green
-           
+        this.gl.clearColor(0, 1, 0, 1); //green
 
-            for (var drawUnit of drawUnits) {
+        for (var drawUnit of drawUnits) {
 
-                // Binds the geometry and sets up the shader's attribute
-                // locations accordingly.
-                drawUnit.geometry.bind(this.pass_prog);       
+            // Binds the geometry and sets up the shader's attribute locations accordingly.
+            drawUnit.geometry.bind(this.first_pass_prog);       
 
-                this.pass_prog.uniforms.u_Model = model;
-                this.pass_prog.uniforms.u_View = view;
-                this.pass_prog.uniforms.u_Persp = projection;
-                this.pass_prog.uniforms.u_InvTrans = invTrans;
-                this.pass_prog.uniforms.u_Near = near;
-                this.pass_prog.uniforms.u_Far = far;
-                this.pass_prog.uniforms.u_Texture = drawUnit.texture.bind(0);
+            this.first_pass_prog.uniforms.u_Model = cameraData.model;
+            this.first_pass_prog.uniforms.u_View = cameraData.view;
+            this.first_pass_prog.uniforms.u_Persp = cameraData.projection;
+            this.first_pass_prog.uniforms.u_InvTrans = cameraData.invTrans;
+            this.first_pass_prog.uniforms.u_Near = cameraData.near;
+            this.first_pass_prog.uniforms.u_Far = cameraData.far;
+            this.first_pass_prog.uniforms.u_Texture = drawUnit.texture.bind(0);
 
-                drawUnit.geometry.draw(this.gl.TRIANGLES);
+            drawUnit.geometry.draw(this.gl.TRIANGLES);
 
-                drawUnit.geometry.unbind();
-            }
-
-
-            // Reset framebuffer and textures.
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-            this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+            drawUnit.geometry.unbind();
         }
 
-        function debugDraw() {
+        // Reset framebuffer and textures.
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    }
 
-            // Enables depth testing, which prevents triangles
-            // from overlapping.
-            this.gl.enable(this.gl.DEPTH_TEST)
-
-            // Enables face culling, which prevents triangles
-            // being visible from behind.
-            this.gl.enable(this.gl.CULL_FACE)
-
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-
-            for (var drawUnit of drawUnits) {                
-
-                drawUnit.geometry.bind(this.debug_prog);
-
-                this.debug_prog.uniforms.u_Model = model;
-                this.debug_prog.uniforms.u_View = view;
-                this.debug_prog.uniforms.u_Persp = projection;
-
-                drawUnit.geometry.draw(this.gl.LINES);
-
-                drawUnit.geometry.unbind();
-
-            }
-        }        
-
-        //Draw time!
-
-        //First Pass
-        //----------        
-        drawMesh.bind(this)();
-
-        //Second Pass
-        //-----------
-
+    // Second Pass render involves combining the framebuffer texture buffers with the direct light.
+    private renderSecondPass(cameraData: CameraRenderData): void {
         // should not be able to see any red.
         this.gl.clearColor(1, 0, 0, 1);
 
-        //this.gl.enable(this.gl.BLEND);
-        this.gl.disable(this.gl.DEPTH_TEST);
-        //this.gl.blendFunc(this.gl.ONE, this.gl.ONE);
+        // Disable blending and and depth testing.
+        this.gl.disable(this.gl.BLEND);
+        this.gl.disable(this.gl.DEPTH_TEST);        
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-        this.gl.viewport(0, 0, width, height);  // Viewport is not set automatically!s
+        this.gl.viewport(0, 0, cameraData.width, cameraData.height);  // Viewport is not set automatically!s
 
-        this.diagnostic_prog.bind();
+        this.second_pass_prog.bind();
 
-        this.gl.bindAttribLocation(this.diagnostic_prog.program, this.quad_positionLocation, "Position");
-        this.gl.bindAttribLocation(this.diagnostic_prog.program, this.quad_texCoordLocation, "Texcoord");
+        this.gl.bindAttribLocation(this.second_pass_prog.program, this.quad_positionLocation, "Position");
+        this.gl.bindAttribLocation(this.second_pass_prog.program, this.quad_texCoordLocation, "Texcoord");
 
         this.diagnosticLocs = [];
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_DisplayType"));        
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Width"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Height"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Depthtex"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Normaltex"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Positiontex"));
-        this.diagnosticLocs.push(this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Colortex"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.second_pass_prog.program, "u_DisplayType"));        
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.second_pass_prog.program, "u_Width"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.second_pass_prog.program, "u_Height"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.second_pass_prog.program, "u_Depthtex"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.second_pass_prog.program, "u_Normaltex"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.second_pass_prog.program, "u_Positiontex"));
+        this.diagnosticLocs.push(this.gl.getUniformLocation(this.second_pass_prog.program, "u_Colortex"));
 
-        this.diagnosticLoc_Light = this.gl.getUniformLocation(this.diagnostic_prog.program, "u_Light");
+        this.diagnosticLoc_Light = this.gl.getUniformLocation(this.second_pass_prog.program, "u_Light");
 
         // Typescript Enum!!
         this.gl.uniform1i(this.diagnosticLocs[0], this.display_type);
-
 
         this.gl.uniform1f(this.diagnosticLocs[1], this.gl.drawingBufferWidth);
         this.gl.uniform1f(this.diagnosticLocs[2], this.gl.drawingBufferHeight);
@@ -477,7 +433,7 @@ export class Renderer {
         // Result: -518.171919 179.003923 -242.517068
         vec3.set(lightPos, -518.171919, 179.003923, -242.517068);
         var lightdest = vec3.create();
-        vec3.transformMat4(lightdest, lightPos, view);
+        vec3.transformMat4(lightdest, lightPos, cameraData.view);
 
         this.gl.uniform3fv(this.diagnosticLoc_Light, lightdest); 
 
@@ -500,9 +456,7 @@ export class Renderer {
 
         // Debug draw the geometry buffers. Don't render positionTexture because it hasn't been normalised by the camera's far clip.
         pip([this.depthRGBTexture, this.colorTexture, this.normalTexture]);
-        
     }
-    
 }
 
 export default Renderer;

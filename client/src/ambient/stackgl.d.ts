@@ -347,6 +347,8 @@ declare module "stackgl" {
         vertShader: WebGLShader;
         fragShader: WebGLShader;
         program: WebGLProgram;
+        attributes: any;
+        uniforms: any;
 
         bind(): void;      
     }
