@@ -105,12 +105,12 @@ Remeber, deferred shading is possible with WebGL 1.0, but you would have to writ
 - https://github.com/tiansijie/DeferredShader
 - http://math.hws.edu/graphicsbook/c7/s4.html render to texture guide
 
-####Entry 5 - Modelling
+####Entry 6 - Modelling
 - Get the wacom out. https://www.youtube.com/watch?v=OFBmg-N41gs
 - First MEL command in a while: worldspace translation for transform: xform -q -t -ws "sceneCamera1aim"
 - Export system: just plain old Maya File->Export Selection. Choose OBJExport as the format, and pop it into the server's `conf/built-assets` folder.  
 
-####Entry 6 - Simple scene lighting
+####Entry 7 - Simple scene lighting
 The simplest way I can think of shading a scene, without it looking like a fixed-function pipeline, is to cheat. That is, account for ambient lighting statically, and sum any contribution from nearby dynamic lights on top of that. Benefits:
     - Even having two lambert lights, say half lambert diffuse, looks better than one.
     - The ambient light contribution is higher when we use half lambert, and gives a huge visual quality increase compared to a constant ambient light value.
@@ -128,7 +128,7 @@ Steps needed:
 - Update the renderer so that it can take a single texture with a set of UVs.
 - Add two dynamic lights to the scene using standard lambert shading that has been used so far.
 
-####Entry 6, part 2 - Sky rendering
+####Entry 7, part 2 - Sky rendering
 Now that the baked texture is rendered with the single dynamic light, we can add more dynamic lights. But before that, let's add the sky! It has such a big impact on the scene.
 - Option 1: skybox rendering. Simple cubemap render. https://github.com/wwwtyro/gl-skybox
 - Option 2: Rayleight and Mie scattering. https://github.com/wwwtyro/glsl-atmosphere
