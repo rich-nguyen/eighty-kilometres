@@ -22,6 +22,10 @@ import orbitCamera = require('canvas-orbit-camera')
 import Geometry = require('gl-geometry')
 import createTexture = require('gl-texture2d')
 
+var ndarray = require("ndarray")
+var createCubemap = require('gl-cubemap-placeholder')
+var createSkybox = require('gl-skybox')
+
 var pip = require('gl-texture2d-pip')
 
 export interface DrawUnit {
@@ -95,6 +99,10 @@ export class Renderer {
     private canvasClientWidth: number;
     private canvasClientHeight: number;
 
+
+    private cubemap: any;
+    private skybox: any;
+
     constructor() {
 
         // Creates a canvas element and attaches it to the <body> on your DOM.hello richard, i loveyou x
@@ -115,8 +123,18 @@ export class Renderer {
         
         var extDepth = this.gl.getExtension("WEBGL_depth_texture");
 
+        var extFragDepth = this.gl.getExtension("EXT_frag_depth");
+
+        if (!extFragDepth) {
+            console.log("Frag Depth is not supported in this browser.");       
+        } else {
+            console.log("Frag Depth support detected.");    
+        }
+
         if (!extDepth) {
             console.log("Extension Depth texture is not supported in this browser.");       
+        } else {
+            console.log("Extension Depth texture support detected.");    
         }
 
         // Resizes the <canvas> to fully fit the window whenever the window is resized.
@@ -208,6 +226,15 @@ export class Renderer {
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);        
         
         this.display_type = DisplayType.Total;
+
+        this.cubemap = createCubemap(this.gl, 512);
+        this.cubemap.generateMipmap();
+        this.cubemap.minFilter = this.gl.LINEAR_MIPMAP_LINEAR;
+        this.cubemap.magFilter = this.gl.LINEAR;
+
+        //deal with depth buffers.
+
+        this.skybox = createSkybox(this.gl, this.cubemap);
     }
 
     private setupFrameBufferTextures(): void {
@@ -218,14 +245,23 @@ export class Renderer {
         if (this.depthTexture) {
             this.depthTexture.dispose();
         }
+
+        //TODO: 
+        //SKYBOX fork : add unbind, enablde depth test, use static sky color gl_FragColor = vec4(0.3, 0.5, 0.8, 1.0);
         this.depthTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.DEPTH_COMPONENT, this.gl.UNSIGNED_SHORT);
 
         if (this.depthRGBTexture) {
             this.depthRGBTexture.dispose();
         }
+
+        
+        
+        
+
         this.depthRGBTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);
         this.depthRGBTexture.magFilter = this.gl.LINEAR;
         this.depthRGBTexture.minFilter = this.gl.LINEAR;
+        
 
         if (this.normalTexture) {
             this.normalTexture.dispose();
@@ -253,7 +289,7 @@ export class Renderer {
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT1_WEBGL, this.gl.TEXTURE_2D, this.colorTexture.handle, 0);
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT2_WEBGL, this.gl.TEXTURE_2D, this.positionTexture.handle, 0);
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT3_WEBGL, this.gl.TEXTURE_2D, this.depthRGBTexture.handle, 0);
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.TEXTURE_2D, this.depthTexture.handle, 0);
+        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.TEXTURE_2D, this.depthTexture.handle, 0); // should use this one, not depthRGB, using framebufferRenderbuffer.
         
 
         if (this.gl.checkFramebufferStatus(this.gl.FRAMEBUFFER) !== this.gl.FRAMEBUFFER_COMPLETE) {
@@ -265,9 +301,19 @@ export class Renderer {
     }
 
     public render(drawUnits: DrawUnit[]): void {
-        var cameraData = this.setupDefaultCamera();
+        const cameraData = this.setupDefaultCamera();
+        
+        
         this.renderFirstPass(drawUnits, cameraData);
         this.renderSecondPass(cameraData);        
+    }
+
+    private clearDepthTexture(): void {
+        
+        const data : any = new Float32Array(this.gl.drawingBufferWidth * this.gl.drawingBufferHeight * 4);
+        data.fill(1.0);
+        const narray : any = ndarray(data, [this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, 4]);
+        this.depthRGBTexture.setPixels(narray);
     }
 
     private setupDefaultCamera(): CameraRenderData {
@@ -348,16 +394,19 @@ export class Renderer {
         
         // Unbind Textures.
         this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+        //this.gl.disable(this.gl.TEXTURE_2D);
 
         // Bind Frame Buffer object.
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
 
         this.gl.disable(this.gl.BLEND);
+        
         this.gl.depthFunc(this.gl.LESS);       
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
+        this.gl.clearColor(0, 0, 0, 1); //black
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-        this.gl.clearColor(0, 1, 0, 1); //green
+        this.clearDepthTexture();   
 
         for (var drawUnit of drawUnits) {
 
@@ -385,13 +434,26 @@ export class Renderer {
     // Second Pass render involves combining the framebuffer texture buffers with the direct light.
     private renderSecondPass(cameraData: CameraRenderData): void {
         // should not be able to see any red.
-        this.gl.clearColor(1, 0, 0, 1);
+        this.gl.clearColor(0, 0, 0, 1);
+
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+        var view = mat4.create()
+        var projection = mat4.create()
+
+        mat4.lookAt(view, [1, 0, 1], [0, 0, 1], [0, 1, 0])
+        mat4.perspective(projection, Math.PI / 2, this.gl.drawingBufferWidth / this.gl.drawingBufferHeight, cameraData.near, 1000.0);
+
+        
 
         // Disable blending and and depth testing.
         this.gl.disable(this.gl.BLEND);
-        this.gl.disable(this.gl.DEPTH_TEST);        
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-        this.gl.viewport(0, 0, cameraData.width, cameraData.height);  // Viewport is not set automatically!s
+        this.gl.enable(this.gl.DEPTH_TEST);        
+        //this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        //this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
+        //this.gl.enable(this.gl.TEXTURE_2D);
+
+        this.gl.viewport(0, 0, cameraData.width, cameraData.height);  // Viewport is not set automatically!
 
         this.second_pass_prog.bind();
 
@@ -438,7 +500,7 @@ export class Renderer {
         this.gl.uniform3fv(this.diagnosticLoc_Light, lightdest); 
 
         this.gl.enableVertexAttribArray(this.quad_positionLocation);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo_vertices);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo_vertices); // THIS BIND IS BREAKING SKYBOX!!!!
         this.gl.vertexAttribPointer(this.quad_positionLocation, 3, this.gl.FLOAT, false, 0, 0);
 
         this.gl.enableVertexAttribArray(this.quad_texCoordLocation);
@@ -451,11 +513,39 @@ export class Renderer {
 
         this.gl.disableVertexAttribArray(this.quad_positionLocation);
         this.gl.disableVertexAttribArray(this.quad_texCoordLocation);
-
-        this.gl.disable(this.gl.BLEND);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null); 
 
         // Debug draw the geometry buffers. Don't render positionTexture because it hasn't been normalised by the camera's far clip.
-        pip([this.depthRGBTexture, this.colorTexture, this.normalTexture]);
+//        pip([this.depthRGBTexture, this.colorTexture, this.normalTexture]);
+
+            // depth is good, thanks to gl_FragDepthEXT in our 2nd pass frag shader.
+        this.skybox.draw({
+            view: view,
+            projection: projection
+        });
+
+        
+        
+        
+
+        //this.gl.enable(this.gl.BLEND);
+        //this.gl.blendFunc(this.gl.ONE, this.gl.ONE);
+        //this.gl.disable(this.gl.DEPTH_TEST);   
+
+        
+        //this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        //this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
+//        this.gl.clearColor(1, 0, 0, 1);
+
+        //this.gl.enable(this.gl.BLEND);
+        //this.gl.blendFunc(this.gl.ONE, this.gl.ONE);
+        
+
+        // this.skybox.draw({
+        //     view: view,
+        //     projection: projection
+        // });        
+
     }
 }
 

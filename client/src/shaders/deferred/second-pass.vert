@@ -9,5 +9,5 @@
     
     void main() {
         fs_Texcoord = Texcoord * 0.5 + vec2(0.5);
-        gl_Position = vec4(Position,1.0);
+        gl_Position = vec4(Position, 1.0);
     }

@@ -358,6 +358,7 @@ declare module "stackgl" {
         handle: WebGLTexture;
         bind(texunit: number): void;
         dispose(): void;
+        setPixels(data: any) :void;
 
         shape: number[];
         wrap: number[];
