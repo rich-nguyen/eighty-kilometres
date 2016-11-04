@@ -1,5 +1,8 @@
 'use strict'
 
+// Taken from https://github.com/wwwtyro/gl-skybox, ported to Typescript.
+// with depth test enabled, and box.unbind() included.
+
 var mat4 = require('gl-mat4')
 var Box3D = require('geo-3d-box')
 var Geometry = require('gl-geometry')
