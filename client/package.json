@@ -18,7 +18,6 @@
     "gl-geometry": "^1.0.0",
     "gl-mat4": "^1.0.0",
     "gl-shader": "^4.0.5",
-    "gl-skybox": "^1.0.1",
     "gl-texture2d": "^2.0.10",
     "gl-texture2d-pip": "^1.0.0",
     "gl-vec3": "^1.0.3",

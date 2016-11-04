@@ -15,7 +15,7 @@ function Skybox (gl, cubemap) {
     .attr('aPosition', box.positions)
     .faces(box.cells)
 
-  var program = glShader(gl, glslify('./skybox.vert'), glslify('./skybox.frag'))
+  var program = glShader(gl, glslify('./shaders/skybox.vert'), glslify('./shaders/skybox.frag'))
 
   var stack = createStack(gl, [
     gl.DEPTH_TEST,

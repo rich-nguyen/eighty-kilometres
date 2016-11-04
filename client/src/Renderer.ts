@@ -24,7 +24,7 @@ import createTexture = require('gl-texture2d')
 
 var ndarray = require("ndarray")
 var createCubemap = require('gl-cubemap-placeholder')
-var createSkybox = require('gl-skybox')
+var createSkybox = require('./SkyBox')
 
 var pip = require('gl-texture2d-pip')
 
