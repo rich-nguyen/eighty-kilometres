@@ -246,8 +246,8 @@ export class Renderer {
             this.depthTexture.dispose();
         }
 
-        //TODO: 
-        //SKYBOX fork : add unbind, enablde depth test, use static sky color gl_FragColor = vec4(0.3, 0.5, 0.8, 1.0);
+        //TODO: add floorplan.jpg
+        //SKYBOX fork : add unbind, enabled depth test, use static sky color gl_FragColor = vec4(0.3, 0.5, 0.8, 1.0);
         this.depthTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.DEPTH_COMPONENT, this.gl.UNSIGNED_SHORT);
 
         if (this.depthRGBTexture) {
