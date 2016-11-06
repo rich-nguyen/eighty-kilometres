@@ -1,7 +1,0 @@
-{
-  "ambientDependencies": {
-    "lodash": "github:DefinitelyTyped/DefinitelyTyped/lodash/lodash-3.10.d.ts#790ebd33d883a3a64e3f53af0e64de65acf81ebc",
-    "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#1c56e368e17bb28ca57577250624ca5bd561aa81",
-    "qwest": "github:DefinitelyTyped/DefinitelyTyped/qwest/qwest.d.ts#7c3fbd694575c8b0dbbc2f14600cb975e1221fd2"
-  }
-}
