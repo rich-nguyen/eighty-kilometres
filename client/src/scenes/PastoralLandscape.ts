@@ -1,7 +1,6 @@
 // A Pastoral Landscape
 
-/// <reference path="../ambient/stackgl.d.ts" />
-/// <reference path="../ambient/typings/main.d.ts" />
+/// <reference path="../types/stackgl.d.ts" />
 
 import { Context, Matrix, Mesh, Texture2D } from 'stackgl'
 import { Scene } from '../SceneManager'

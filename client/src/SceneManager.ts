@@ -1,8 +1,7 @@
 // The scene, loaded as a package from some source (server or app resource)
 // will be updated by the game logic, and drawn to screen by the renderer.
 
-/// <reference path="ambient/typings/main.d.ts" />
-/// <reference path="ambient/stackgl.d.ts" />
+/// <reference path="types/stackgl.d.ts" />
 
 
 import { PastoralLandscape } from './scenes/PastoralLandscape'
