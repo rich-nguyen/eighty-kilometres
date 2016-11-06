@@ -12,7 +12,10 @@ export class Application {
   public run(): void {
     this.sceneManager = new SceneManager();     
     this.renderer = new Renderer();
-    this.sceneManager.loadScene(this.renderer.gl);  
+
+    this.renderer.isReady.then( () => {
+      this.sceneManager.loadScene(this.renderer.gl);
+    });
   }
 
   // The logic/update loop, which updates all of the variables
@@ -20,8 +23,10 @@ export class Application {
   // for you to keep `update` and `render` as separate steps.
   public update = () => {
 
-    var drawUnits = this.sceneManager.getDrawUnits();
-    this.renderer.render(drawUnits);
+    this.renderer.isReady.then( () => {
+      var drawUnits = this.sceneManager.getDrawUnits();
+      this.renderer.render(drawUnits);
+    });
   }
 }
 
