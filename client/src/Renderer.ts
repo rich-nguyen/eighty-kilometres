@@ -3,10 +3,9 @@
 // https://hacks.mozilla.org/2014/01/webgl-deferred-shading
 // https://github.com/YuqinShao/Tile_Based_WebGL_DeferredShader
 
-/// <reference path="ambient/typings/main.d.ts" />
-/// <reference path="ambient/stackgl.d.ts" />
+/// <reference path="types/stackgl.d.ts" />
 
-import { Context, Matrix, Shader, Texture2D } from 'stackgl'
+import { Context, Matrix, Shader, Texture2D, TextureCube } from 'stackgl'
 import { Application } from './app'
 import createContext = require('gl-context')
 import * as mat4 from 'gl-mat4'
@@ -22,11 +21,15 @@ import orbitCamera = require('canvas-orbit-camera')
 import Geometry = require('gl-geometry')
 import createTexture = require('gl-texture2d')
 
-var ndarray = require("ndarray")
-var createCubemap = require('gl-cubemap-placeholder')
-var createSkybox = require('./SkyBox')
+import ndarray = require("ndarray")
 
-var pip = require('gl-texture2d-pip')
+import createSkybox = require('./SkyBox')
+import createTextureCube = require('gl-texture-cube')
+
+import pip = require('gl-texture2d-pip')
+import { loadTexture } from  './Texture' 
+
+import when = require('when')
 
 export interface DrawUnit {
     geometry: any
@@ -98,10 +101,10 @@ export class Renderer {
 
     private canvasClientWidth: number;
     private canvasClientHeight: number;
-
-
-    private cubemap: any;
+    
     private skybox: any;
+
+    public isReady: when.Promise<any>;
 
     constructor() {
 
@@ -227,14 +230,39 @@ export class Renderer {
         
         this.display_type = DisplayType.Total;
 
-        this.cubemap = createCubemap(this.gl, 512);
-        this.cubemap.generateMipmap();
-        this.cubemap.minFilter = this.gl.LINEAR_MIPMAP_LINEAR;
-        this.cubemap.magFilter = this.gl.LINEAR;
+        this.isReady = this.createCubemap().then((cubemap) => {
+            this.skybox = createSkybox(this.gl, cubemap);
+        });        
+    }
 
-        //deal with depth buffers.
+    private createCubemap(): when.Promise<TextureCube>  {
+        const maybeTextures: when.Promise<Array<HTMLImageElement>> = when.all<Array<HTMLImageElement>>([
+            loadTexture('http://localhost:9000/client/assets/built-assets/textures/sky11/frontav9.jpg'),
+            loadTexture('http://localhost:9000/client/assets/built-assets/textures/sky11/backav9.jpg'),
+            loadTexture('http://localhost:9000/client/assets/built-assets/textures/sky11/leftav9.jpg'),
+            loadTexture('http://localhost:9000/client/assets/built-assets/textures/sky11/rightav9.jpg'),
+            loadTexture('http://localhost:9000/client/assets/built-assets/textures/sky11/topav9.jpg'),
+            loadTexture('http://localhost:9000/client/assets/built-assets/textures/sky11/topav9.jpg')
+        ])
 
-        this.skybox = createSkybox(this.gl, this.cubemap);
+        const maybeCubemap: when.Promise<TextureCube> = maybeTextures.then( (cubeTextures) => {
+            const elements = {
+                pos: {
+                    x: cubeTextures[0],
+                    y: cubeTextures[1],
+                    z: cubeTextures[2]
+                },
+                neg: {
+                    x: cubeTextures[3],
+                    y: cubeTextures[4],
+                    z: cubeTextures[5]
+                }
+            };
+
+            return createTextureCube(this.gl, elements);
+        })        
+
+        return maybeCubemap; 
     }
 
     private setupFrameBufferTextures(): void {
@@ -245,8 +273,7 @@ export class Renderer {
         if (this.depthTexture) {
             this.depthTexture.dispose();
         }
-
-        //TODO: add floorplan.jpg, and skybox texture
+        
         this.depthTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.DEPTH_COMPONENT, this.gl.UNSIGNED_SHORT);
 
         if (this.depthRGBTexture) {
@@ -283,7 +310,6 @@ export class Renderer {
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT2_WEBGL, this.gl.TEXTURE_2D, this.positionTexture.handle, 0);
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.ext.COLOR_ATTACHMENT3_WEBGL, this.gl.TEXTURE_2D, this.depthRGBTexture.handle, 0);
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.TEXTURE_2D, this.depthTexture.handle, 0); // should use this one, not depthRGB, using framebufferRenderbuffer.
-        
 
         if (this.gl.checkFramebufferStatus(this.gl.FRAMEBUFFER) !== this.gl.FRAMEBUFFER_COMPLETE) {
             // Can't use framebuffer. See http://www.khronos.org/opengles/sdk/docs/man/xhtml/glCheckFramebufferStatus.xml
