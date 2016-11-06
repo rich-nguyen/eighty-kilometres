@@ -262,11 +262,6 @@ declare module "gl-mat4" {
     export function fromQuat(out: Matrix, q: Matrix): Matrix;
 }
 
-declare module "bunny" {
-    export var positions: any;
-    export var cells: any;
-}
-
 declare module "canvas-fit" {
     
     function fit(canvas: Node, parent?: any, scale?: any): any
@@ -366,6 +361,10 @@ declare module "stackgl" {
         minFilter: number;
         mipSamples: number;
     }
+
+    export class TextureCube {
+
+    }
 }
 
 declare module "gl-context" {
@@ -419,6 +418,20 @@ declare module "gl-texture2d" {
     export = createTexture2d;
 }
 
+declare module "gl-texture-cube" {
+    
+    import {Context, TextureCube} from 'stackgl'
+
+    function createTextureCube(context: Context, elements: any): TextureCube;
+
+    export = createTextureCube;
+}
+
+declare module "gl-texture2d-pip" {
+    function pip(textures: any): void;
+
+    export = pip;   
+}
 declare module "unindex-mesh" {
 
     function unindex(positions: any, cells: any, out?: any): any;
