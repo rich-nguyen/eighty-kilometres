@@ -3,9 +3,8 @@
 1. aws-cli - brew install awscli
 2. beefy - npm install -g beefy@2.1.8 browserify@13.1.1 gulp-cli@1.2.2
 - Build prod: gulp
-- Build dev : beefy src/app.ts:app.js 8000 -- -p [ tsify ]
-3. typescript - npm install -g typescript@1.7.5 typings@0.6.6
-- typings install, in src/ambient folder
+- Build dev : beefy src/app.ts:app.js 8000 -- -p [ tsify --allowJs -- noImplicitAny ]
+3. typescript - npm install -g typescript@2.0
 
 ###Log Book
 
@@ -57,7 +56,7 @@ Async webgl would be ideal. a webgl web worker? three js is a retained mode wrap
 #####Must have features
 - global illumination. Radiosity, photon mapping. A baked radiosity solution replaces the ambient and diffuse terms in standard lighting, but doesn't model dynamic lights; too slow for that, of course.
 - BRDF surface shader. Oren-Nayar(BRDF diffuse), Cook-Torrance (BRDF specular).
-- shadows. Variance shadow maps.
+- shadows. Variance shadow maps. http://doc.babylonjs.com/tutorials/Shadows
 - Anti aliasing.
 - Sky box. gl-skybox
 - Deferred shading, G Buffers. Tiled shader is more performant.
@@ -133,6 +132,7 @@ Now that the baked texture is rendered with the single dynamic light, we can add
 - Option 1: skybox rendering. Simple cubemap render. https://github.com/wwwtyro/gl-skybox
 - Option 2: Rayleight and Mie scattering. https://github.com/wwwtyro/glsl-atmosphere
 - Option 3: Another atmospheric shader model, with sun spotlight. http://codeflow.org/entries/2011/apr/13/advanced-webgl-part-2-sky-rendering/
+- https://tf2maps.net/threads/tutorial-the-complete-guide-to-implementing-custom-skybox-textures-and-env-lighting.5268/
 
 ####Maya Gotchas
 - completely lost shading on a mesh: it was the Mesh Component Display, Display Colors was ticked. Untick it, or toggle it with Color->Toggle Display Colors Attribute.
