@@ -35,7 +35,7 @@ function Skybox (gl, cubemap) {
     gl.enable(gl.CULL_FACE)
     gl.cullFace(gl.FRONT)
 
-    // Disble depth test & write.
+    // Enable depth test, to avoid over-drawing, but do not write a new depth.
     gl.enable(gl.DEPTH_TEST)
     gl.depthMask(false)
 

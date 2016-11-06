@@ -45,25 +45,10 @@ void main(void)
     {
         if(diffuse == 0.0) {
              diffuse = dot(-normal, normalize(light - position));
-        }       
-        
-        // if Less than near, more than far, needs to be excluded from drawing.
-        /*if (depth.x < 0.1) { 
-            gl_FragColor = vec4(0.1,0.3,1.0,1.0); //blue;
-        } else if (depth.x > 0.8) {
-            gl_FragColor = vec4(0.1,0.6,0.5,1.0); //green
-        } else    {
-            gl_FragColor = vec4(diffuse * color , 1.0);
-        }*/
-        //{
-            gl_FragDepthEXT = depth.x;     
-        //} else {
-
-            gl_FragColor = vec4(diffuse * color , 1.0);
-            
-        
-
-                        
+        }
+        // Write the fragment depth from the pre-calculated depth buffer.
+        gl_FragDepthEXT = depth.x;     
+        gl_FragColor = vec4(diffuse * color , 1.0);
     }
     else
     {

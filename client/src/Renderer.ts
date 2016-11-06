@@ -246,22 +246,15 @@ export class Renderer {
             this.depthTexture.dispose();
         }
 
-        //TODO: add floorplan.jpg
-        //SKYBOX fork : add unbind, enabled depth test, use static sky color gl_FragColor = vec4(0.3, 0.5, 0.8, 1.0);
+        //TODO: add floorplan.jpg, and skybox texture
         this.depthTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.DEPTH_COMPONENT, this.gl.UNSIGNED_SHORT);
 
         if (this.depthRGBTexture) {
             this.depthRGBTexture.dispose();
         }
-
-        
-        
-        
-
         this.depthRGBTexture = createTexture(this.gl, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight, this.gl.RGBA, this.gl.FLOAT);
         this.depthRGBTexture.magFilter = this.gl.LINEAR;
         this.depthRGBTexture.minFilter = this.gl.LINEAR;
-        
 
         if (this.normalTexture) {
             this.normalTexture.dispose();
@@ -301,8 +294,7 @@ export class Renderer {
     }
 
     public render(drawUnits: DrawUnit[]): void {
-        const cameraData = this.setupDefaultCamera();
-        
+        const cameraData = this.setupDefaultCamera();       
         
         this.renderFirstPass(drawUnits, cameraData);
         this.renderSecondPass(cameraData);        
@@ -437,21 +429,11 @@ export class Renderer {
         this.gl.clearColor(0, 0, 0, 1);
 
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        this.gl.clear(this.gl.DEPTH_BUFFER_BIT);               
 
-        var view = mat4.create()
-        var projection = mat4.create()
-
-        mat4.lookAt(view, [1, 0, 1], [0, 0, 1], [0, 1, 0])
-        mat4.perspective(projection, Math.PI / 2, this.gl.drawingBufferWidth / this.gl.drawingBufferHeight, cameraData.near, 1000.0);
-
-        
-
-        // Disable blending and and depth testing.
+        // Disable blending and enable depth testing.
         this.gl.disable(this.gl.BLEND);
-        this.gl.enable(this.gl.DEPTH_TEST);        
-        //this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-        //this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
-        //this.gl.enable(this.gl.TEXTURE_2D);
+        this.gl.enable(this.gl.DEPTH_TEST);
 
         this.gl.viewport(0, 0, cameraData.width, cameraData.height);  // Viewport is not set automatically!
 
@@ -513,39 +495,22 @@ export class Renderer {
 
         this.gl.disableVertexAttribArray(this.quad_positionLocation);
         this.gl.disableVertexAttribArray(this.quad_texCoordLocation);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null); 
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);       
 
-        // Debug draw the geometry buffers. Don't render positionTexture because it hasn't been normalised by the camera's far clip.
-//        pip([this.depthRGBTexture, this.colorTexture, this.normalTexture]);
+        // Draw Skybox based on depth, thanks to gl_FragDepthEXT in our 2nd pass frag shader.
+        const skyboxView = mat4.create();
+        const skyboxProjection = mat4.create();
 
-            // depth is good, thanks to gl_FragDepthEXT in our 2nd pass frag shader.
+        mat4.lookAt(skyboxView, [1, 0, 1], [0, 0, 1], [0, 1, 0])
+        mat4.perspective(skyboxProjection, Math.PI / 2, this.gl.drawingBufferWidth / this.gl.drawingBufferHeight, cameraData.near, 1000.0);
+
         this.skybox.draw({
-            view: view,
-            projection: projection
+            view: skyboxView,
+            projection: skyboxProjection
         });
 
-        
-        
-        
-
-        //this.gl.enable(this.gl.BLEND);
-        //this.gl.blendFunc(this.gl.ONE, this.gl.ONE);
-        //this.gl.disable(this.gl.DEPTH_TEST);   
-
-        
-        //this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-        //this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
-//        this.gl.clearColor(1, 0, 0, 1);
-
-        //this.gl.enable(this.gl.BLEND);
-        //this.gl.blendFunc(this.gl.ONE, this.gl.ONE);
-        
-
-        // this.skybox.draw({
-        //     view: view,
-        //     projection: projection
-        // });        
-
+        // Debug draw the geometry buffers. Don't render positionTexture because it hasn't been normalised by the camera's far clip.
+        pip([this.depthRGBTexture, this.colorTexture, this.normalTexture]);
     }
 }
 
